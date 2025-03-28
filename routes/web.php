@@ -35,7 +35,7 @@ Route::get('/form', [IndexController::class, 'landing'])->name('landing');
 Route::get('/properties', [IndexController::class, 'properties'])->name('properties');
 
 
- //Route::get('/property-detail/{slug?}', [IndexController::class, 'propertyDetail'])->name('property-detail');
+//Route::get('/property-detail/{slug?}', [IndexController::class, 'propertyDetail'])->name('property-detail');
 Route::get('/property-detail/{home_type}/{slug}', [IndexController::class, 'propertyDetail'])->name('property-detail');
 
 Route::get('specialoffers', [IndexController::class, 'specialoffers'])->name('specialoffers');

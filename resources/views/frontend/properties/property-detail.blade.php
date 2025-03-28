@@ -5,6 +5,9 @@
         max-width: 70px;
         object-fit: contain;
     }
+    html {
+    scroll-behavior: smooth;
+    }
 </style>
     <div class="page-wrapper">
        
@@ -125,7 +128,7 @@
                                         $averageRating = $property->homeReviews->avg('rating') ?? 5;
                                     @endphp
                                     <div class="overall-rating">
-                                        <strong>{{ number_format($averageRating, 1) }}/5</strong>
+                                        <strong><a href="#rating" class="text-decoration-none">{{ number_format($averageRating, 1) }}/5</a></strong>
                                         <span>({{ $totalReviews }})</span>
                                     </div>
                                 </div>
@@ -243,7 +246,7 @@
 
                             {{-- Review start  --}}
                          @if ($property && $property->homeReviews->isNotEmpty())
-                            <div class="group">
+                            <div class="group" id="rating">
                                 <h3 class="ci-title">Reviews:</h3>
                                 <div class="content mb-3">
                                     <div class="row align-items-end mb-4">
@@ -2170,6 +2173,34 @@ function toggleButtonState() {
     });
 });
 
+
     </script>
+
+    {{-- <script>
+
+        function BookNow() {
+            var checkinTextElement = document.querySelector('.js-checkin-text');
+            // var checkinbtn = document.querySelector('.btn-checkin');
+
+            // let inputCalendar = document.getElementById('hero-calendar');
+            // window.datepickerHero.open();
+
+            // alert(checkinbtn);
+
+
+            console.log('Current Check-in Text:', checkinTextElement.textContent.trim()); // Debugging
+
+            if (checkinTextElement.textContent.trim() === 'Check-In') {
+                // datepickerHero(); 
+                // if (window.datepickerHero && typeof window.datepickerHero.open === 'function') {
+                //     checkinTextElement.classList.add('active'); // Add active class
+                //     alert('Opening Date Picker'); // Debugging
+                // } else {
+                //     console.error('DatepickerHero is not defined!');
+                // }
+            }
+        }
+        
+    </script> --}}
     
 @endsection

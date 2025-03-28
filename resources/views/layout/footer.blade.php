@@ -40,9 +40,9 @@
                                     <li>
                                         <a href="{{route('becomeahost')}}">Become a Host</a>
                                     </li>
-                                    <li>
+                                    {{-- <li>
                                         <a href="{{route('contactus')}}">Get in Touch</a>
-                                    </li>
+                                    </li> --}}
                                 </ul>
                             </div>                          
                             <div class="col-12 col-md">

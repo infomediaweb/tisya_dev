@@ -122,7 +122,7 @@
                             @endforeach
                         </div>
                     </div>
-                    <div class="row justify-content-center mt-4 pt-3 d-none d-lg-flex">
+                    <div class="row justify-content-center mt-4 pt-3 d-lg-flex">
                         <div class="col-auto position-relative">
                             <button class="btn p-0 swiper-outer-prev"><span class="icon-arrow-left"></span></button>
                         </div>
@@ -216,7 +216,7 @@
                             @endforeach
                         </div>
                     </div>
-                    <div class="row justify-content-center mt-4 pt-3 d-none d-lg-flex">
+                    <div class="row justify-content-center mt-4 pt-3 d-lg-flex">
                         <div class="col-auto position-relative">
                             <button class="btn p-0 swiper-outer-prev"><span class="icon-arrow-left"></span></button>
                         </div>
@@ -501,7 +501,7 @@
                             <!--</div>-->
                         </div>
                     </div>
-                    <div class="row justify-content-center mt-4 pt-3 d-none d-lg-flex">
+                    <div class="row justify-content-center mt-4 pt-3 d-lg-flex">
                         <div class="col-auto position-relative">
                             <button class="btn p-0 swiper-outer-prev"><span class="icon-arrow-left"></span></button>
                         </div>
@@ -536,7 +536,7 @@
                            Explore our selection of the best places to stay in Goa
                         </div>
                     </div>
-                    <div class="col-auto align-self-end order-2 order-lg-0  ms-lg-auto d-none d-lg-flex">
+                    <div class="col-auto align-self-end order-2 order-lg-0  ms-lg-auto d-lg-flex">
                         <div class="navBox row justify-content-center my-3">
                             <div class="col-auto position-relative"><button class="btn p-0 swiper-outer-prev"><span class="icon-arrow-left"></span></button></div>
                             <div class="col-auto position-relative"><button class="btn p-0 swiper-outer-next"><span class="icon-arrow-right"></span></button></div>
@@ -855,16 +855,16 @@
                 <div class="col">
                     <div class="row align-items-center">
                         <div class="col-auto me-auto">
-                           <img loading="lazy" src="{{ asset('assets/images/mig.jpg') }}" alt="">
+                           <a href="https://mediaindia.eu/tourism/interview-with-gagan-gambhir-founder-tisya-stays-goa/" target="_blank"><img loading="lazy" src="{{ asset('assets/images/mig.jpg') }}" alt=""></a>
                         </div>
                         <div class="col-auto me-auto">
-                           <img loading="lazy" src=" {{ asset('assets/images/mw.jpg') }}" alt="">
+                           <a href="https://www.mansworldindia.com/fashion/style/a-goan-escapade-with-tisyastays" target="_blank"><img loading="lazy" src=" {{ asset('assets/images/mw.jpg') }}" alt=""></a>
                         </div>
                         <div class="col-auto me-auto">
-                           <img loading="lazy" src="{{ asset('assets/images/theman.jpg') }}" alt="">
+                           <a href="#" target="_blank"><img loading="lazy" src="{{ asset('assets/images/theman.jpg') }}" alt=""></a>
                         </div>
                         <div class="col-auto me-auto">
-                           <img loading="lazy" src="{{ asset('assets/images/ad.jpg') }}" alt="">
+                           <a href="https://www.architecturaldigest.in/story/check-in-to-this-goa-homestay-that-makes-guests-feel-like-part-of-the-family/" target="_blank"><img loading="lazy" src="{{ asset('assets/images/ad.jpg') }}" alt=""></a>
                         </div>
                     </div>
                 </div>                   

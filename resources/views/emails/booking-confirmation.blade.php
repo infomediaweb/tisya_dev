@@ -403,7 +403,7 @@
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tbody><tr>
                             <td style="padding: 30px; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px; color: #000000;">
-                                <p style="margin: 0 0 20px;">For any further assistance or to make changes to your booking, please contact us at <strong>resrvations@tisyastays.com</strong> or <strong>+91 84529 92240</strong>.</p>
+                                <p style="margin: 0 0 20px;">For any further assistance or to make changes to your booking, please contact us at <strong>resrvations@tisyastays.com</strong> or <strong>+91 87999 15100</strong>.</p>
                                 <p style="margin: 0;">We look forward to welcoming you to Tisya Stays and hope you have a pleasant stay.</p>
                             </td>
                         </tr>

@@ -89,7 +89,8 @@
                     <div class="properties-listing">
                         @if(!empty($properties) && $properties->count() >0)
                             @foreach($properties as $property)
-                                <div  class="property-item itemsList">
+                                <div class="property-item itemsList" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key, 'location_name' => $location_name, 'checkin_date' => $checkin_date, 'checkout_date' => $checkout_date, 'city_id' => $city_id, 'total_guests' => $total_guests, 'adultsCount' => $adultsCount, 'childrenCount' => $childrenCount, 'guestCount' => $guestCount]) }}', '_blank');" 
+                                    style="cursor: pointer;">
                                     <div class="row">
                                         <div class="col-12 col-lg-5 position-relative col-xxl-4">
                                             <a  href="{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key,
@@ -189,7 +190,7 @@
                                                     'childrenCount' => $childrenCount, 
                                                     'guestCount' => $guestCount,
                                                     
-                                                    ]) }}" target="_blank" class="btn btn-primary">View Detail</a>
+                                                    ]) }}" target="_blank" class="btn btn-primary">View Details</a>
                                                 </div>
                                             </div>
                                         </div>

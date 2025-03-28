@@ -21,8 +21,9 @@
                         </div>    
                         <div class="col">
                             <h4 class="fw-bold text-primary">Contact</h4>
-                            <p class="mb-1"><a class="text-decoration-none" href="tel:+91 87999 15100">+91 87999 15100</a></p>
-                            <p><a class="text-decoration-none" href="tel:+91 87999 14701">+91 87999 14701</a></p>
+                            <p class="mb-1"><a class="text-decoration-none" href="tel:+91 87999 15100">+91 87999 15100</a>, <a class="text-decoration-none" href="tel:+91 87999 14701">+91 87999 14701</a></p>
+                            <p class="mb-1"><a class="text-decoration-none" href="mailto:reservations@tisyastays.com">reservations@tisyastays.com</a></p>
+                            <p class="mb-1"><span>Time : </span>9:30 to 6:30</p>
                         </div>
                     </div>
                     <div class="row gx-3">
