@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "../nnc/rc-cms-latest/rc-cms"
+		},
+		{
+			"path": "../nnc/rc-cms-latest/rc-frontend"
+		}
+	]
+}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <g id="menu-grid-r" transform="translate(-8 -8)">
+    <g id="Group_124" data-name="Group 124">
+      <path id="Path_104" data-name="Path 104" d="M8,8h8v8H8Z"/>
+      <path id="Path_105" data-name="Path 105" d="M8,20h8v8H8Z"/>
+      <path id="Path_106" data-name="Path 106" d="M16,32H8v8h8Z"/>
+      <path id="Path_107" data-name="Path 107" d="M20,8h8v8H20Z"/>
+      <path id="Path_108" data-name="Path 108" d="M28,20H20v8h8Z"/>
+      <path id="Path_109" data-name="Path 109" d="M20,32h8v8H20Z"/>
+      <path id="Path_110" data-name="Path 110" d="M40,8H32v8h8Z"/>
+      <path id="Path_111" data-name="Path 111" d="M32,20h8v8H32Z"/>
+      <path id="Path_112" data-name="Path 112" d="M40,32H32v8h8Z"/>
+    </g>
+  </g>
+</svg>

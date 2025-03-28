@@ -1,0 +1,1 @@
+const t=(e,a,i=2)=>{const s=["image/jpg","image/jpeg","image/png","image/webp","image/svg+xml","video/mp4","application/pdf"],p=i*1024*1024;if(e.size>p||a||!s.includes(e.type))return!1};export{t as v};

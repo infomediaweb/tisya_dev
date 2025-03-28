@@ -1,0 +1,351 @@
+<html lang="en" class=" "><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Tisya Stays</title>
+    <link rel="shortcut icon" type="image/png" href="https://tisya.tempsite.in/assets/images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/list-BZGOrX1f.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/pagination-pqc4JPgu.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/debouncedRef-feHcH_8F.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/modal-DQrXHo_t.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/common-C3njvQR4.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/dayjs.min-BQUt4EL8.js">
+    <link rel="stylesheet" crossorigin="" href="https://tisya.tempsite.in/build/assets/list-T5Cr5IWS.css">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/add-BaYndsd6.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/list-CwoGzv4x.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/no-img-x9zeKCez.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/list-DH5s_wd3.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/change-password-Czw16Qsr.js">
+    <link rel="modulepreload" as="script" crossorigin="" href="https://tisya.tempsite.in/build/assets/tooltip-DQS-QpnS.js">
+    <style>
+        :root{
+            --primary:#00423C;
+            --secondary:#E56D00;
+            --dark:#222222;
+        }
+        .text-primary{
+            color: var(--primary) !important;
+        }
+        .text-secondary{
+            color: var(--secondary) !important;
+        }
+        body{
+            font-family: "Inter", serif;
+        }
+        .bg-danger-light{
+            background-color: #FEE9E9;
+        }
+        .bg-success-light{
+            background-color: #E3EEE3;
+        }  
+        .card-chartBox{
+            font-weight: bold;
+        } 
+        .card-chartBox h5{
+            color: var(--dark) !important;
+            font-weight: bold;
+        }    
+        .card-chartBox h2{
+            font-weight: bold;
+        }  
+        .chartBox canvas {
+           height:160px;
+           width:100%;
+        }
+        .chartBoxPie canvas {
+           height:300px;
+           width:100%;
+        }
+        .channelList h5{
+            margin: 0;
+            padding: 0;
+            font-size:18px;
+        }
+        .colorDot{
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            border-radius:4px;
+        }
+        .airbnb h5, .airbnb span{
+            color: var(--primary) !important;
+        }
+        .airbnb .colorDot{
+            background-color: var(--primary);
+        }
+        .mmt h5, .mmt span{
+            color: var(--secondary) !important;
+        }
+        .mmt .colorDot{
+            background-color: var(--secondary);
+        }
+        .site h5, .site span{
+            color: #976425 !important;
+        }
+        .site .colorDot{
+            background-color: #976425;
+        }
+        .tabs{list-style-type: none; margin: 0; padding: 2px; display:flex; background: #E2E2E2; border-radius:6px;}
+        .tabs li{padding:2px;}
+        .tabs li a{display: inline-block; padding:5px 25px; text-transform: uppercase; font-size:13px;border-radius:6px; text-decoration: none; color:#333;}
+        .tabs li a:hover, .tabs li a.active{display: inline-block; background: #ffffff; color: #000000; box-shadow: 1px 1px 3px rgba(0,0,0,0.2);}
+        .tabContent{display:none;}
+        .filter{border: 1px solid #999 !important; border-radius: 4px !important; padding:8px 15px !important; font-size: 14px !important;}
+        .filterOption{display:none; width:420px; position: absolute; top:40px; right:4px; z-index: 9; background:#ffffff; border-radius:6px; border:1px solid #e1e1e1; box-shadow:3px 3px 5px rgba(0,0,0,0.12); padding:20px;}
+        .filterOption ul{list-style-type: none; margin:0; padding:0; display: flex; flex-wrap:wrap;}
+        .filterOption ul li{}
+        .filterOption ul li a{display:inline-block; padding:3px 12px; border-radius:50px; margin: 3px; font-size:13px; text-decoration: none; background:var(--primary); color:#ffffff}
+        @media screen and (max-width: 768px) {           
+        }
+    </style>
+</head>
+    <body contenteditable="false" data-new-gr-c-s-check-loaded="14.1215.0" data-gr-ext-installed="" class="">
+        <div id="app" data-v-app=""><div class="wrapper clearfix"><header class="header-main compensate-for-scrollbar"><div class="container-fluid px-3"><div class="row align-items-center"><div class="col-auto header-logo"><a href="/pms/booking-list" class="logo"><img src="https://tisya.tempsite.in/build/assets/logo-Cy0QCfCa.png" alt="Tisya Stays"></a></div><div class="col-auto d-none d-xl-block"><button class="btn px-2 menu-toggle"><span class="line"></span><span class="line"></span><span class="line"></span></button></div><div class="col"><div class="header-nav"><div class="row align-items-center justify-content-end"><div class="col-auto"><div div="" class="btn-group"><button type="button" class="btn user-btn d-flex p-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><span class="u-img bg-secondary"> A </span><span class="u-name">Hi Admin</span></button><ul class="dropdown-menu dropdown-menu-end" style=""><li class="d-xl-none"><span class="fw-medium dropdown-item-text">Hi Admin</span></li><li class="d-xl-none"><hr class="dropdown-divider"></li><li><a href="/pms/change-password" class="router-link-active router-link-exact-active dropdown-item" aria-current="page">Change Password</a></li><li><button class="dropdown-item" type="button">Logout</button></li></ul></div></div></div></div></div><div class="col-auto d-xl-none ps-0"><button class="btn px-2 menu-toggle"><span class="line"></span><span class="line"></span><span class="line"></span></button></div></div></div></header><main class="main container-fluid"><div class="row"><aside class="sidebar"><div class="main-nav"><ul class="m-0 list-unstyled"><li class=""><a href="/pms/booking-list" class=""><i class="icon-dashboard"></i> <span>Dashboard</span></a></li><li class="has-dropdown"><a href="javascript:void(0)"><i class="icon-user"></i> <span>User</span></a><div class="submenu" style="display: none;"><ul><li class=""><a href="/pms/add-user" class="">Add</a></li><li><a href="/pms/list-user" class="">Manage</a></li></ul></div><span class="expend"></span></li><li class="has-dropdown"><a href="javascript:void(0)"><i class="icon-property"></i> <span>Home Management</span></a><div class="submenu"><ul><li><a href="/pms/add-home" class="">Add Home</a></li><li><a href="/pms/manage-home" class="">Manage Homes</a></li></ul></div><span class="expend"></span></li><li class="has-dropdown"><a href="javascript:void(0)"><i class="icon-booking"></i> <span>Bookings</span></a><div class="submenu" style="display: none;"><ul><li><a href="/pms/new-booking" class="">New Booking</a></li><li class=""><a href="/pms/booking-list" class="">All Bookings</a></li></ul></div><span class="expend"></span></li><li><a href="/pms/guest-database" class=""><i class="icon-database"></i> <span>Guest Database</span></a></li><li><a href="/pms/list-coupon" class=""><i class="bi bi-tag fs-5"></i> <span>Coupons</span></a></li><li class="has-dropdown"><a href="javascript:void(0)"><i class="icon-report"></i> <span>Reports</span></a><div class="submenu"><ul><li><a href="/pms/sale-report" class="">Sale</a></li></ul><ul><li><a href="/pms/police-verification" class="">Police Verification</a></li></ul></div><span class="expend"></span></li><li class="has-dropdown"><a href="javascript:void(0)"><i class="icon-settings"></i> <span>Masters</span></a><div class="submenu"><ul><li><a href="/pms/list-company" class="">Company</a></li><li><a href="/pms/list-location" class="">Locations</a></li><li><a href="/pms/list-home-type" class="">Home Type</a></li><li><a href="/pms/list-amenities" class="">Amenities</a></li><li><a href="/pms/list-tags" class="">Tags</a></li><li><a href="/pms/gst" class="">GST</a></li></ul></div><span class="expend"></span></li><li class="has-dropdown active"><a href="javascript:void(0)"><i class="icon-cms"></i> <span>CMS</span></a><div class="submenu" style="display: block;"><ul><li class="active"><a href="/pms/list-collection" class="">Collections</a></li><li><a href="/pms/privacy-policy" class="">Privacy Policy</a></li><li><a href="/pms/cancellation-and-refund-policy" class="">Cancellation &amp; Refund Policy</a></li><li><a href="/pms/footer-banner-content" class="">Footer Banner Content</a></li><li><a href="/pms/hero-slide" class="">Banner Slide</a></li><li><a href="/pms/about-us" class="">About Us</a></li><li><a href="/pms/list-special-offer" class="">Special Offers</a></li><li><a href="/pms/addventure-content" class="">Adventure</a></li><li class=""><a href="/pms/list-blog" class="">Blogs</a></li><li><a href="/pms/list-faqs" class="">Frequently Asked Questions</a></li><li><a href="/pms/terms-and-condition" class="">Terms and Conditions</a></li></ul></div><span class="expend"></span></li></ul></div></aside>
+            
+            
+            
+            <div class="content-wrap col-12">
+                <div class="page-wrap">
+                    <div class="w-100 my-0 py-4">
+                        <section class="section">        
+                            <div class="container-fluid">
+                               
+                               <div class="form-box">
+                                    <div class="row gx-2 align-items-center">
+                                        <div class="col"><h2 class="fw-normal mb-4">Dashboard</h2></div>
+                                        <div class="col-auto">
+                                            <select name="" class="form-select" id="">
+                                                <option value="">Last 30 days</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-auto position-relative">
+                                            <a href="#" class="btn btn-md btn-outline-dark filter"><i class="bi bi-sort-down me-2"></i> Filter</a>
+                                            <div class="filterOption">
+                                                <h6><b>Location</b></h6>
+                                                <ul>
+                                                    <li><a href="#">Goa</a></li>
+                                                    <li><a href="#">Uttarakhand</a></li>
+                                                </ul>
+                
+                                                <h6 class="mt-3 mb-2"><b>Property Name</b></h6>                                
+                                                <div class="formwrap">
+                                                    <div class="row g-0 align-items-center">
+                                                        <div class="col">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" placeholder="Enter property name" aria-label="Enter property name" aria-describedby="basic-addon1">
+                                                                
+                                                                <button class="btn btn-dark btn-md input-group-text" id="basic-addon1"><i class="bi bi-search"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <div class="row g-4 chartRow">
+                    
+                                        <div class="col-12 col-xl-4">
+                                            <div class="card card-chartBox bg-transparent">
+                                                <div class="card-body p-0">
+                                                    <div class="row align-items-center m-3">
+                                                        <div class="col-12">
+                                                            <h5>Net Revenue</h5>
+                                                        </div>
+                                                        <div class="col-auto"><h2 class="text-primary">₹5,328,206</h2></div>
+                                                        <div class="col-auto"><span class="rounded-pill bg-danger text-white py-1 px-2"><i class="bi bi-arrow-down"></i> 3.63%</span></div>
+                                                    </div>
+                                                    
+                                                    <div class="chartBox">
+                                                        <canvas id="netRevenue"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="col-12 col-xl-4">
+                                            <div class="card card-chartBox bg-transparent">
+                                                <div class="card-body p-0">
+                                                    <div class="row align-items-center m-3">
+                                                        <div class="col-12">
+                                                            <h5>Average Price Per Night</h5>
+                                                        </div>
+                                                        <div class="col-auto"><h2 class="text-secondary">₹5,200</h2></div>
+                                                        <div class="col-auto"><span class="rounded-pill bg-success text-white py-1 px-2"><i class="bi bi-arrow-up"></i> 2.5%</span></div>
+                                                    </div>
+                                                    
+                                                    <div class="chartBox">
+                                                        <canvas id="perPerNight"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="col-12 col-xl-4">
+                                            <div class="card card-chartBox bg-transparent">
+                                                <div class="card-body p-0">
+                                                    <div class="row align-items-center m-3">
+                                                        <div class="col-12">
+                                                            <h5>Bookings Created</h5>
+                                                        </div>
+                                                        <div class="col-auto"><h2 class="text-primary">841</h2></div>
+                                                        <div class="col-auto"><span class="rounded-pill bg-success text-white py-1 px-2"><i class="bi bi-arrow-up"></i> 12%</span></div>
+                                                    </div>
+                                                    
+                                                    <div class="chartBox">
+                                                        <canvas id="bookingsCreated"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="col-12 col-xl-4">
+                                            <div class="card card-chartBox bg-transparent">
+                                                <div class="card-body p-0">
+                                                    <div class="row align-items-center m-3">
+                                                        <div class="col-12">
+                                                            <h5>Nights Filled</h5>
+                                                        </div>
+                                                        <div class="col-auto"><h2 class="text-secondary">1,215</h2></div>
+                                                        <div class="col-auto"><span class="rounded-pill bg-success text-white py-1 px-2"><i class="bi bi-arrow-up"></i> 0.3%</span></div>
+                                                    </div>
+                                                    
+                                                    <div class="chartBox">
+                                                        <canvas id="nightsFilled"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="col-12 col-xl-4">
+                                            <div class="card card-chartBox bg-transparent">
+                                                <div class="card-body p-0">
+                                                    <div class="row align-items-center m-3">
+                                                        <div class="col-12">
+                                                            <h5>Occupancy Rates</h5>
+                                                        </div>
+                                                        <div class="col-auto"><h2 class="text-primary">75%</h2></div>
+                                                        <div class="col-auto"><span class="rounded-pill bg-danger text-white py-1 px-2"><i class="bi bi-arrow-down"></i> 1%</span></div>
+                                                    </div>
+                                                    
+                                                    <div class="chartBox">
+                                                        <canvas id="occupancyRates"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="col-12 col-xl-4 d-flex">
+                                            <div class="card card-chartBox bg-transparent w-100">
+                                                <div class="card-body p-0 d-flex flex-column justify-content-center">
+                                                    <div class="row align-items-center m-3">
+                                                        <div class="col-12">
+                                                            <h5>Average Length of Stay</h5>
+                                                        </div>
+                                                        <div class="col-auto"><h2 class="text-secondary">4 Nights</h2></div>                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-0 d-flex flex-column justify-content-center border-top">
+                                                    <div class="row align-items-center m-3">
+                                                        <div class="col-12">
+                                                            <h5>Average Lead Time</h5>
+                                                        </div>
+                                                        <div class="col-auto"><h2 class="text-primary">21 Days</h2></div>                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="col-12 col-xl-8 d-flex">
+                                            <div class="card card-chartBox w-100 bg-transparent">
+                                                <div class="card-body p-4">
+                                                    <div class="row align-items-center mb-4">
+                                                        <div class="col">
+                                                            <h5>Weekly Revenue Analysis</h5>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <ul class="tabs">
+                                                                <li><a href="javascript:void(0);" class="active" data-tab="net">Net</a></li>
+                                                                <li><a href="javascript:void(0);" data-tab="gross">Gross</a></li>
+                                                            </ul>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    <div >
+                                                        <div class="tabContent" data-content="net" style="display:block;">
+                                                            <canvas id="WeeklyNetRevenue"></canvas>
+                                                        </div>
+                                                        
+                                                        <div class="tabContent" data-content="gross">
+                                                            <canvas id="WeeklyGrossRevenue"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>  
+                    
+                                        <div class="col-12 col-xl-4 d-flex">
+                                            <div class="card card-chartBox bg-transparent w-100">
+                                                <div class="card-body p-4">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-12">
+                                                            <h5>Channel Distribution / Revenue</h5>
+                                                        </div>
+                                                        <div class="col-auto"><h2 class="text-secondary">₹7,512,200</h2></div>
+                                                    </div>
+                                                    
+                                                    <div class="chartBoxPie mt-4">
+                                                        <canvas id="channelDistributionRevenue"></canvas>
+                                                    </div>
+                                                    
+                                                    <div class="channelList mt-4">
+                
+                                                        <div class="row gx-3 align-items-center my-2 airbnb">
+                                                            <div class="col-auto"><span class="colorDot"></span></div>
+                                                            <div class="col"><h5>Airbnb</h5></div>
+                                                            <div class="col-auto">305  /  <span>₹4,557,300</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row gx-3 align-items-center my-2 mmt">
+                                                            <div class="col-auto"><span class="colorDot"></span></div>
+                                                            <div class="col"><h5>Makemytrip</h5></div>
+                                                            <div class="col-auto">112  /  <span>₹2,130,870</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row gx-3 align-items-center my-2 site">
+                                                            <div class="col-auto"><span class="colorDot"></span></div>
+                                                            <div class="col"><h5>Internal Booking</h5></div>
+                                                            <div class="col-auto">17  /  <span>₹981,680</span>
+                                                            </div>
+                                                        </div>
+                
+                                                    </div>
+                
+                                                </div>
+                                            </div>
+                                        </div>                      
+                    
+                                    </div>
+                    
+                               </div>
+                            </div>
+                        </section>
+                    </div>
+                
+                     
+                </div>
+            </div>
+
+
+            
+        
+        
+        </div></main></div><div data-v-6d995ec0="" class="toast-container position-fixed top-0 end-0 p-3"><div data-v-6d995ec0="" class="toast border-0" role="alert" aria-live="assertive" aria-atomic="true"><div data-v-6d995ec0="" class="row flex-nowrap align-items-center"><div data-v-6d995ec0="" class="col-auto"><div data-v-6d995ec0="" id="icon" class="ms-2 fs-4 bi"></div></div><div data-v-6d995ec0="" class="col ps-0"><div data-v-6d995ec0="" id="toastContent" class="toast-body p-0"></div></div><div data-v-6d995ec0="" class="col-auto"><span data-v-6d995ec0="" class="close-btn" data-bs-dismiss="toast" aria-label="Close"><i data-v-6d995ec0="" class="bi bi-x-lg"></i></span></div></div></div></div></div>
+        
+        
+</body>
+</html>

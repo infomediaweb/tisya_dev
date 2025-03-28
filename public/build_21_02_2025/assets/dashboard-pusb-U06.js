@@ -1,0 +1,1 @@
+import{j as s,a as t,c,b as e}from"./app-Bv7sA21o.js";const o={},n={class:"section section-hero section-anim"},a=e("div",{class:"container container-xl-fluid text-center"},[e("h1",{class:"mt-5"},"Tisya Stays")],-1),r=[a];function i(_,d){return t(),c("section",n,r)}const f=s(o,[["render",i]]);export{f as default};
