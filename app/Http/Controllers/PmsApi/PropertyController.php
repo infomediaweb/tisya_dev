@@ -23,9 +23,11 @@ use App\Mail\BookingConfirmationEmail;
 use App\Services\RazorpayService;
 use App\Exports\SaleReportExport;
 use App\Exports\PoliceVerificationReport;
+use App\Mail\BookingCancellationEmail;
 use DB;
 use Mail;
 use Carbon\Carbon;
+use Razorpay\Api\Api;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PropertyController extends Controller{
@@ -33,7 +35,10 @@ class PropertyController extends Controller{
 
     public function propertyList(Request $request){
         try {
-            $no_of_guests = $request->no_adults + $request->no_children;
+            //$no_of_guests = $request->no_adults + $request->no_children;
+            
+            $no_of_guests = $request->no_adults;
+            
             $last_date =  date('Y-m-d', strtotime($request->checkout_date. '-1 days'));
             $checkin_date =  $request->checkin_date;
             if($last_date == $request->checkin_date){
@@ -201,7 +206,9 @@ class PropertyController extends Controller{
 
     public function propertyAvailabilityDetail(Request $request){
         try {
-            $no_of_guests = $request->no_adults + $request->no_children;
+            //$no_of_guests = $request->no_adults + $request->no_children;
+            $no_of_guests = $request->no_adults;
+            
             $id = $request->propertyId;
             $last_date =  date('Y-m-d', strtotime($request->checkout_date. '-1 days'));
             $checkin_date =  $request->checkin_date;
@@ -342,7 +349,7 @@ class PropertyController extends Controller{
 
 
     public function savePropertyBooking(Request $request){
-       
+     
         $validator = Validator::make($request->all(), [
             'checkInDate' => 'required',
             'checkOutDate' => 'required',
@@ -367,6 +374,32 @@ class PropertyController extends Controller{
             else{
                 $count = 1;
             }
+            
+            if($request->id){
+                $detail = PropertyBooking::where('id', $request->id)->first();
+                
+                if($detail){
+                    $startDate =  date('Y-m-d', strtotime($detail->checkin_date));
+                    $endDate =  date('Y-m-d', strtotime($detail->checkout_date));
+                    $startDate = Carbon::create($startDate);
+                    $endDate = Carbon::create($endDate);
+                    
+                    $unblockDateFrom = date('Y-m-d', strtotime($detail->checkin_date));
+                    $unblockDateTo = date('Y-m-d', strtotime($detail->checkout_date));
+                    for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+                        $cDate = $date->toDateString();
+                        if($cDate == date('Y-m-d')){
+                            $unblockDateFrom = $cDate;
+                        }    
+                    }
+                    $home  =  TblHome::where('id', $detail->property_id)->first();;
+                    unBlockPropertyAvailabilityInRu(
+                        $home->ru_property_id,
+                        $unblockDateFrom,
+                        $unblockDateTo
+                    );
+                }    
+            }
             $propertyBooking = PropertyBooking::firstOrNew(['id'=>$request->id]);
             $propertyBooking->location_id = $request->locationId;
             $propertyBooking->property_id = $request->propertyId;
@@ -384,7 +417,7 @@ class PropertyController extends Controller{
             $propertyBooking->type = $request->type;
             $propertyBooking->no_of_children = $request->no_children;
             $propertyBooking->no_of_adult = $request->no_adult?$request->no_adult:1;
-            $propertyBooking->customer_detail = json_encode(array('first_name'=>$request->first_name, 'last_name'=>$request->last_name, 'email'=>$request->email_address , 'mobile_number'=>$request->mobile_number, 'note'=>$request->note));
+            $propertyBooking->customer_detail = json_encode(array('first_name'=>$request->first_name, 'last_name'=>$request->last_name, 'email'=>$request->email_address , 'mobile_number'=>$request->c_code.$request->mobile_number, 'note'=>$request->note));
             $propertyBooking->checkin_date = $request->checkInDate;
             $propertyBooking->checkout_date = $request->checkOutDate;
             $propertyBooking->per_night_price = $request->per_night_price;
@@ -404,6 +437,8 @@ class PropertyController extends Controller{
                 $propertyBooking->created_by = $request->booking_created_by;
             }
             $propertyBooking->save();
+ 
+          
             $home = TblHome::where('id', $request->propertyId)->first();
 
             $message = 'Booking Saved successfully';
@@ -413,7 +448,7 @@ class PropertyController extends Controller{
             blockPropertyAvailabilityInRu($home->ru_property_id, $request->checkInDate , $request->checkOutDate);
             $emailData =  array('id'=>$request->id, 'bookingDetail'=>$propertyBooking);
             Mail::to($request->email_address)->send(new BookingConfirmationEmail($emailData));
-            //Mail::to(env('TISYA_SUPPORT_EMAIL'))->send(new BookingConfirmationEmail($emailData));
+            Mail::to(env('TISYA_SUPPORT_EMAIL'))->send(new BookingConfirmationEmail($emailData));
             return response()->json([
                 'status' => true,
                 'data' => '',
@@ -437,6 +472,9 @@ class PropertyController extends Controller{
             })
             ->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')->with('paymentRequests')->orderBy('id', 'desc')->get(['tbl_homes.home_name', 'tbl_homes.home_type', 'tbl_homes.state', 'tbl_homes.location', 'property_bookings.*', 'property_bookings.tax_inclusive']);
             $tax_inclusive = PropertyBooking::where('id', $id)->first('tax_inclusive');
+            $customerDetail = $detail[0]->customer_detail;
+            $customerDetail['mobile_number'] = str_replace('+91', '', $customerDetail['mobile_number']);
+            $detail[0]->customer_detail = json_encode($customerDetail);
             return response()->json([
                 'status' => true,
                 'data' => $detail,
@@ -454,164 +492,121 @@ class PropertyController extends Controller{
 
     
     
-    // public function propertyBookingList(Request $request, $role=NULL, $userId=NULL){
-    //     try{
-    //         $list = PropertyBooking::query()
-    //             ->when(isset($request->property_id) && $request->property_id !='', function ($query) use ($request) {
-    //                 return $query->where('property_id', $request->property_id);
-    //             })
-    //             ->when(isset($role) && $role == 'Owner', function ($query) use ($userId) {
-    //                 return $query->where('tbl_homes.user_id', $userId);
-    //             })
-    //             ->when(isset($request->booking_id) && $request->booking_id !='', function ($query) use ($request) {
-    //                 return $query->where('booking_id', $request->booking_id);
-    //             })
-    //             ->when(isset($request->channel) && $request->channel !='', function ($query) use ($request) {
-    //                 return $query->where('channel', $request->channel);
-    //             });
-
-    //         if (isset($request->type) && $request->type !='') {
-    //             if ($request->type == 'checkin') {
-    //                 $list = $list->when(isset($request->checkin_date) && isset($request->checkout_date), function ($query) use ($request) {
-    //                         return $query->where('checkin_date', '>=', $request->checkin_date)
-    //                                     ->where('checkin_date', '<=', $request->checkout_date);
-    //                     })
-    //                     ->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')
-    //                     ->with('paymentRequests')
-    //                     ->orderBy('checkin_date', 'asc')
-    //                     ->get(['tbl_homes.home_name', 'tbl_homes.home_type', 'tbl_homes.state', 'tbl_homes.location', 'property_bookings.*']);
-    //             } else {
-    //                 $list = $list->when(isset($request->checkin_date) && isset($request->checkout_date), function ($query) use ($request) {
-    //                         return $query->where('checkout_date', '>=', $request->checkin_date)
-    //                                     ->where('checkout_date', '<=', $request->checkout_date);
-    //                     })
-    //                     ->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')
-    //                     ->with('paymentRequests')
-    //                     ->orderBy('checkout_date', 'asc')
-    //                     ->get(['tbl_homes.home_name', 'tbl_homes.home_type', 'tbl_homes.state', 'tbl_homes.location', 'property_bookings.*']);
-    //             }
-    //         } else {
-    //             $list = $list->when(isset($request->checkin_date) && isset($request->checkout_date), function ($query) use ($request) {
-    //                     return $query->where('checkin_date', '>=', $request->checkin_date)
-    //                                 ->where('checkin_date', '<=', $request->checkout_date);
-    //                 })
-    //                 ->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')
-    //                 ->with('paymentRequests')
-    //                 ->orderBy('id', 'desc')
-    //                 ->get(['tbl_homes.home_name', 'tbl_homes.home_type', 'tbl_homes.state', 'tbl_homes.location', 'property_bookings.*']);
-    //         }
-    //         $finalData = array();
-    //         foreach($list as $key=>$value){
-    //             $paidAmount = PropertyBookingPaymentRequest::where('property_booking_id', $value->id)->where('booking_request_status', 'Payment Received')->sum('amount');
-    //             $payment_status = 'pending';
-    //             $booking_status = 'not_confirmed';
-    //             if($paidAmount == $value->payable_amount){
-    //                 $payment_status = 'paid';
-    //                 $booking_status = 'confirmed';
-    //             }
-
-    //             $search_payment_status = '';
-    //             $search_booking_status = '';
-    //             if(isset($request->booking_status)){
-    //                 $search_booking_status = $request->booking_status;
-    //             }
-    //             if(isset($request->payment_status)){
-    //                 $search_payment_status = $request->payment_status;
-    //             }
-
-    //             if($value->booking_created_by == 'ru'){
-    //                 $payment_status = 'paid';
-    //                 $booking_status = 'confirmed';
-    //             }
-
-    //             if($search_payment_status !='' && $search_booking_status ==''){
-    //                 if($search_payment_status==$payment_status){
-    //                     array_push($finalData, $value);
-    //                 }
-    //             }
-    //             else if($search_payment_status =='' && $search_booking_status !=''){
-    //                 if($search_booking_status==$booking_status){
-    //                     array_push($finalData, $value);
-    //                 }
-    //             }
-    //             else if($search_payment_status !='' && $search_booking_status !=''){
-    //                 if($search_booking_status==$booking_status && $search_payment_status==$payment_status){
-    //                     array_push($finalData, $value);
-    //                 }
-    //             }
-    //             else{
-    //                 array_push($finalData, $value);
-    //             }
-    //         }
-
-    //         $disableDatesArray = array();
-    //         if(isset($role) && $role == 'Owner'){
-    //             if($finalData){
-    //                 foreach($finalData as $booking){
-    //                     $startDate = Carbon::create(date('Y-m-d', strtotime($booking->checkin_date)));
-    //                     $endDate = Carbon::create(date('Y-m-d', strtotime($booking->checkout_date)));
-    //                     for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
-    //                         array_push($disableDatesArray, $date->toDateString());
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         $proeprtyQuery = TblHome::query()
-    //         ->when(isset($role) && $role =='Owner', function ($proeprtyQuery) use ($userId) {
-    //             return $proeprtyQuery->where('user_id', $userId);
-    //         })->with('additionalCharge')->whereNotNull('ru_property_id')->get();
- 
-
-    //         // dd($request->all());
-    //         return response()->json([
-    //             'status' => true,
-    //             'data' => $finalData,
-    //             'proeprtyList'=>$proeprtyQuery,
-    //             'disableDatesArray'=>$disableDatesArray,
-    //             'message' => 'Booking Listed Successfully.'
-    //         ], 200);
-    //     }
-    //     catch(Exception $e){
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-public function propertyBookingList(Request $request, $role=NULL, $userId=NULL){
+    public function propertyBookingList(Request $request, $role=NULL, $userId=NULL){
         try{
             $list = PropertyBooking::query()
-            ->when(isset($request->property_id), function ($query) use ($request) {
-                return $query->where('property_id', $request->property_id);
-            })
-            ->when(isset($role) && $role =='Owner', function ($query) use ($userId) {
-                return $query->where('tbl_homes.user_id', $userId);
-            })
-            ->when(isset($request->booking_id), function ($query) use ($request) {
-                return $query->where('booking_id', $request->booking_id);
-            })
-            ->when(isset($request->channel), function ($query) use ($request) {
-                return $query->where('channel', $request->channel);
-            })
-            ->when(isset($request->payment_status), function ($query) use ($request) {
-                return $query->where('payment_status', $request->payment_status);
-            })
-            ->when(isset($request->booking_status), function ($query) use ($request) {
-                return $query->where('property_booking_status', $request->booking_status);
-            })
-            ->when(isset($request->checkin_date) && isset($request->checkout_date), function ($query) use ($request) {
-                return $query->where('checkin_date', '>=', $request->checkin_date)->where('checkout_date', '<=', $request->checkout_date);
-            })
-            ->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')->with('paymentRequests')->where('payable_amount', '>', 0)->orderBy('id', 'desc')->get(['tbl_homes.home_name', 'tbl_homes.internal_name', 'tbl_homes.ru_property_id',  'tbl_homes.home_type', 'tbl_homes.state', 'tbl_homes.location', 'property_bookings.*']);
+                ->when(isset($request->property_id) && $request->property_id !='', function ($query) use ($request) {
+                    return $query->where('property_id', $request->property_id);
+                })
+                ->when(isset($role) && $role == 'Owner', function ($query) use ($userId) {
+                    return $query->where('tbl_homes.user_id', $userId);
+                })
+                ->when(isset($request->booking_id) && $request->booking_id !='', function ($query) use ($request) {
+                    return $query->where('booking_id', $request->booking_id);
+                })
+                ->when(isset($request->channel) && $request->channel !='', function ($query) use ($request) {
+                    return $query->where('channel', $request->channel);
+                });
+
+            if (isset($request->type) && $request->type !='') {
+                if ($request->type == 'checkin') {
+                    $list = $list->when(isset($request->checkin_date) && isset($request->checkout_date), function ($query) use ($request) {
+                            return $query->where('checkin_date', '>=', $request->checkin_date)
+                                        ->where('checkin_date', '<=', $request->checkout_date);
+                        })
+                        ->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')
+                        ->with('paymentRequests')
+                        ->orderBy('checkin_date', 'asc')
+                        ->get(['tbl_homes.home_name', 'tbl_homes.home_type', 'tbl_homes.state', 'tbl_homes.location', 'property_bookings.*']);
+                } else {
+                    $list = $list->when(isset($request->checkin_date) && isset($request->checkout_date), function ($query) use ($request) {
+                            return $query->where('checkout_date', '>=', $request->checkin_date)
+                                        ->where('checkout_date', '<=', $request->checkout_date);
+                        })
+                        ->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')
+                        ->with('paymentRequests')
+                        ->orderBy('checkout_date', 'asc')
+                        ->get(['tbl_homes.home_name', 'tbl_homes.home_type', 'tbl_homes.state', 'tbl_homes.location', 'property_bookings.*']);
+                }
+            } else {
+                $list = $list->when(isset($request->checkin_date) && isset($request->checkout_date), function ($query) use ($request) {
+                        return $query->where('checkin_date', '>=', $request->checkin_date)
+                                    ->where('checkin_date', '<=', $request->checkout_date);
+                    })
+                    ->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')
+                    ->with('paymentRequests')
+                    ->orderBy('id', 'desc')
+                    ->get(['tbl_homes.home_name', 'tbl_homes.home_type', 'tbl_homes.state', 'tbl_homes.location', 'property_bookings.*']);
+            }
+            $finalData = array();
+            foreach($list as $key=>$value){
+                $paidAmount = PropertyBookingPaymentRequest::where('property_booking_id', $value->id)->where('booking_request_status', 'Payment Received')->sum('amount');
+                $payment_status = 'pending';
+                $booking_status = 'not_confirmed';
+                if($paidAmount == $value->payable_amount){
+                    $payment_status = 'paid';
+                    $booking_status = 'confirmed';
+                }
+
+                $search_payment_status = '';
+                $search_booking_status = '';
+                if(isset($request->booking_status)){
+                    $search_booking_status = $request->booking_status;
+                }
+                if(isset($request->payment_status)){
+                    $search_payment_status = $request->payment_status;
+                }
+
+                if($value->booking_created_by == 'ru'){
+                    $payment_status = 'paid';
+                    $booking_status = 'confirmed';
+                }
+
+                if($search_payment_status !='' && $search_booking_status ==''){
+                    if($search_payment_status==$payment_status){
+                        array_push($finalData, $value);
+                    }
+                }
+                else if($search_payment_status =='' && $search_booking_status !=''){
+                    if($search_booking_status==$booking_status){
+                        array_push($finalData, $value);
+                    }
+                }
+                else if($search_payment_status !='' && $search_booking_status !=''){
+                    if($search_booking_status==$booking_status && $search_payment_status==$payment_status){
+                        array_push($finalData, $value);
+                    }
+                }
+                else{
+                    array_push($finalData, $value);
+                }
+            }
+
+            $disableDatesArray = array();
+            if(isset($role) && $role == 'Owner'){
+                if($finalData){
+                    foreach($finalData as $booking){
+                        $startDate = Carbon::create(date('Y-m-d', strtotime($booking->checkin_date)));
+                        $endDate = Carbon::create(date('Y-m-d', strtotime($booking->checkout_date)));
+                        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+                            array_push($disableDatesArray, $date->toDateString());
+                        }
+                    }
+                }
+            }
+
             $proeprtyQuery = TblHome::query()
             ->when(isset($role) && $role =='Owner', function ($proeprtyQuery) use ($userId) {
                 return $proeprtyQuery->where('user_id', $userId);
             })->with('additionalCharge')->whereNotNull('ru_property_id')->get();
+ 
+
+            // dd($request->all());
             return response()->json([
                 'status' => true,
-                'data' => $list,
+                'data' => $finalData,
                 'proeprtyList'=>$proeprtyQuery,
+                'disableDatesArray'=>$disableDatesArray,
                 'message' => 'Booking Listed Successfully.'
             ], 200);
         }
@@ -622,6 +617,7 @@ public function propertyBookingList(Request $request, $role=NULL, $userId=NULL){
             ], 500);
         }
     }
+
 
 
     public function propertyBookingListTest(Request $request, $role=NULL, $userId=NULL){
@@ -754,10 +750,9 @@ public function propertyBookingList(Request $request, $role=NULL, $userId=NULL){
     //         ], 500);
     //     }
     // }
-
-
-
-public function getPropertyBookingDetail($id){
+    
+    
+    public function getPropertyBookingDetail($id){
         try{
            // dd($id);
             $bookingDetail = PropertyBooking::leftJoin('tbl_location', 'tbl_location.id', '=', 'property_bookings.location_id')->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')->with('bookingGuests')->where('property_bookings.id', $id)->first();
@@ -974,13 +969,44 @@ public function getPropertyBookingDetail($id){
             $detail = TblHome::where('id', $id)->whereNotNull('ru_property_id')->first();
             $propertyUnavailableDates = DB::table('ru_property_availabilities')->where('ru_property_id', $detail->ru_property_id)->where('is_available', 'no')->get()->pluck('availability_date')->toArray();
             
-            $previouslyBookedCheckoutDates = PropertyBooking::where('property_id', $detail->id)->where('checkout_date', '>', date('Y-m-d'))->where('property_booking_status', 'Confirmed')->pluck('checkout_date')->toArray();
+            
+            $previouslyBookedCheckoutDates = PropertyBooking::where('property_id', $detail->ru_property_id)
+                ->where('checkout_date', '>', date('Y-m-d'))
+                ->where('property_booking_status', '!=', 'Canceled')
+                ->pluck('checkout_date')
+                ->toArray();
+            
+            foreach ($previouslyBookedCheckoutDates as $checkoutDate) {
+                $checkin = PropertyBooking::where('property_id', $detail->ru_property_id)
+                    ->where('checkin_date', $checkoutDate) // corrected spelling here
+                    ->where('property_booking_status', '!=', 'Canceled')
+                    ->first();
+            
+                if ($checkin) {
+                    $previouslyBookedCheckoutDates = array_filter($previouslyBookedCheckoutDates, function ($date) use ($checkin) {
+                        return $date !== $checkin->checkin_date;
+                    });
+                    // Reset indexes
+                    $previouslyBookedCheckoutDates = array_values($previouslyBookedCheckoutDates);
+                }
+            }
 
             $propertyUnavailableDates = array_unique($propertyUnavailableDates);
             $previouslyBookedCheckoutDates = array_unique($previouslyBookedCheckoutDates);
             $updatedUnavailableDates = array_values(array_diff($propertyUnavailableDates, $previouslyBookedCheckoutDates));
             
+        
             
+            $lastDate = Carbon::parse(max($updatedUnavailableDates));
+            $startDate = $lastDate->copy()->addDay();
+            $endDate = $lastDate->copy()->addYears(5);
+            
+            $futureDates = [];
+            while ($startDate <= $endDate) {
+                $futureDates[] = $startDate->toDateString();
+                $startDate->addDay();
+            }
+            $updatedUnavailableDates = array_merge($updatedUnavailableDates, $futureDates);
             
             
             if($request->bookingId){
@@ -991,14 +1017,18 @@ public function getPropertyBookingDetail($id){
                 $endDate = Carbon::create($endDate); // YYYY, MM, DD
                 for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
                     $cDate = $date->toDateString();
-                    $propertyUnavailableDates = array_diff($propertyUnavailableDates, [$cDate]);
-                    $propertyUnavailableDates = array_values($propertyUnavailableDates);
+                    if($cDate >= date('Y-m-d')){
+                        $updatedUnavailableDates = array_diff($updatedUnavailableDates, [$cDate]);
+                        $updatedUnavailableDates = array_values($updatedUnavailableDates);
+                    }    
                 }
             }
+            
             
             return response()->json([
                 'status' => true,
                 'propertyUnavailableDates' => $updatedUnavailableDates,
+                'bookingId'=>$request->bookingId,
                 'message' => 'Listed successfully.'
             ], 200);
         }
@@ -1047,8 +1077,9 @@ public function getPropertyBookingDetail($id){
 
             $delete = PropertyBooking::where(['id' => $id])->delete();
 
-            $emailData =  array('id'=>'', 'bookingDetail'=>$bookingDetail);
-            // Mail::to($bookingDetail->customer_detail['email'])->send(new BookingCancellationEmail($emailData));
+            //$emailData =  array('id'=>'', 'bookingDetail'=>$bookingDetail);
+            //$customerDetail = json_decode($bookingDetail->customer_detail);
+           // Mail::to($customerDetail->email)->send(new BookingCancellationEmail(array('mailData'=>$bookingDetail, 'type'=>'customer')));
             return response()->json([
                 'status' => true,
                 'message'=> "Successfully Deleted"
@@ -1105,9 +1136,8 @@ public function getPropertyBookingDetail($id){
     //         ], 500);
     //     }
     // }
-
-
-public function savePropertyBookingIds(Request $request){
+    
+    public function savePropertyBookingIds(Request $request){
         try{
             foreach($request->guest_list as $key=>$guest){
 
@@ -1182,39 +1212,59 @@ public function savePropertyBookingIds(Request $request){
         }
     }
 
-
     public function bookingExport(Request $request) {
         return Excel::download(new BookingExport($request->all()), 'bookings.xlsx');
     }
 
 
+    // public function getBookingEnquiry(){
+
+    //     try{
+    //         $list = BookingEnquiry::with(['location', 'property'])->get();
+    //         return response()->json([
+    //             'status'=>true,
+    //             'data'=>$list,
+    //             'message' => 'Booking Enquiry Listed Successfully.'
+    //         ], 200);
+    //     }
+    //     catch(Exception $e){
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+    
     public function getBookingEnquiry(Request $request){
 
         try{
            // $list = BookingEnquiry::with(['location', 'property'])->get();
-           
-            $perPage = $request->has('take') ? $request->get('take') : 20;
-             $query = BookingEnquiry::query();
-             $query->when(
-                 isset($request->checkin_date) && isset($request->checkout_date),
-                 function ($q) use ($request) {
-                     return $q->where('checkin_date', '>=', $request->checkin_date)
-                              ->where('checkout_date', '<=', $request->checkout_date);
-                 }
-             );
-             $query->when(
-                 !empty($request->property_name),
-                 function ($q) use ($request) {
-                     return $q->whereHas('property', function ($subQuery) use ($request) {
-                         $subQuery->where('home_name', 'like', '%' . $request->property_name . '%');
-                     });
-                 }
-             );
-             
-             $list = $query->with(['location', 'property'])
-                           ->orderBy('id', 'desc')
-                           ->paginate($perPage);
-           
+
+          // $perPage = $request->has('take') ? $request->get('take') : 20;
+
+         //  $list = BookingEnquiry::with(['location', 'property'])->orderBy('id', 'desc')->paginate($perPage);
+        
+         $perPage = $request->has('take') ? $request->get('take') : 20;
+         $query = BookingEnquiry::query();
+         $query->when(
+             isset($request->checkin_date) && isset($request->checkout_date),
+             function ($q) use ($request) {
+                 return $q->where('checkin_date', '>=', $request->checkin_date)
+                          ->where('checkout_date', '<=', $request->checkout_date);
+             }
+         );
+         $query->when(
+             !empty($request->property_name),
+             function ($q) use ($request) {
+                 return $q->whereHas('property', function ($subQuery) use ($request) {
+                     $subQuery->where('home_name', 'like', '%' . $request->property_name . '%');
+                 });
+             }
+         );
+         
+         $list = $query->with(['location', 'property'])
+                       ->orderBy('id', 'desc')
+                       ->paginate($perPage);
             return response()->json([
                 'status'=>true,
                 'data'=>$list,
@@ -1240,39 +1290,33 @@ public function savePropertyBookingIds(Request $request){
     public function saleReport(Request $request, $role=NULL, $userId=NULL){
         try{
             $list = PropertyBooking::query()
-            
                 ->when($request->has('searchChannel') && $request->searchChannel !='', function ($query) use ($request) {
                     return $query->where('channel', $request->searchChannel);
                 })
-                
                 ->when($request->has('searchPaymentStatus') && $request->searchPaymentStatus !='', function ($query) use ($request) {
                     return $query->where('property_bookings.property_booking_status', $request->searchPaymentStatus);
                 })
-                
-                
                 ->when($request->has('searchPropertyId') && $request->searchPropertyId !='', function ($query) use ($request) {
                     return $query->where('property_id', $request->searchPropertyId);
                 })
 
-                ->when($request->has('checkin_date') && $request->has('checkout_date') && $request->checkin_date !='' && $request->checkout_date !='', function ($query) use ($request) {
-                    // if ($request->checkin_date) {
-                    //     return $query->whereDate('property_bookings.created_at', '>=', $request->checkin_date);
-                    // }
-
-                    // if ($request->checkout_date) {
-                    //     return $query->whereDate('property_bookings.created_at', '<=', $request->checkout_date);
-                    // }
-                    
+                ->when($request->has('searchtype') && $request->searchtype !=''  && $request->has('checkin_date') && $request->has('checkout_date') && $request->checkin_date !='' && $request->checkout_date !='', function ($query) use ($request) {
+                     
                     if ($request->searchtype == 'checkin') {
-                        return $query->whereDate('property_bookings.checkin_date', '>=', $request->checkin_date);
+                        return $query->whereBetween('property_bookings.checkin_date', [$request->checkin_date, $request->checkout_date]);
                     }
                     if ($request->searchtype == 'BookingDate') {
-                        return $query->whereDate('property_bookings.created_at', '>=', $request->checkin_date);
+                        return $query->whereBetween('property_bookings.created_at' , [$request->checkin_date, $request->checkout_date]);
                     }
 
                 })
+                ->when($request->searchtype =='' && $request->has('checkin_date') && $request->has('checkout_date') && $request->checkin_date !='' && $request->checkout_date !='', function ($query) use ($request) {
+                     
+                    return $query->where('property_bookings.checkin_date',  '>=', $request->checkin_date)->where('property_bookings.checkout_date',  '<=', $request->checkout_date);
+
+                })
                 ->where('property_bookings.payable_amount', '>', 0)
-                ->where('property_bookings.booking_status', 'paid')
+                //->where('property_bookings.booking_status', 'paid')
                 ->leftJoin('tbl_homes', 'tbl_homes.id', '=', 'property_bookings.property_id')->with('paymentRequests')
                 ->orderBy('property_bookings.created_at', 'desc')
                 ->get(['tbl_homes.home_name', 'tbl_homes.home_type', 'tbl_homes.state', 'tbl_homes.location', 'property_bookings.*']);
@@ -1435,6 +1479,24 @@ public function savePropertyBookingIds(Request $request){
                 $bookingDetail->checkin_date,
                 $bookingDetail->checkout_date
             );
+            
+            if(!is_array($bookingDetail->customer_detail)){
+                 $customerDetail = json_decode($bookingDetail->customer_detail);
+                 $email = $bookingDetail->customer_detail;
+            }
+            else{
+                $customerDetail =$bookingDetail->customer_detail;
+                $email= $bookingDetail->customer_detail['email'];
+            }
+            Mail::to($email)->send(new BookingCancellationEmail(array('mailData'=>$bookingDetail, 'type'=>'customer')));
+            
+            if($bookingDetail->transcation_id && $bookingDetail->channel=='Website'){
+                $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
+                $payment = $api->payment->fetch($bookingDetail->transcation_id);
+                $refund = $payment->refund(['amount' => $bookingDetail->payable_amount*100]);
+            }
+            
+               
             return response()->json(
                 [
                     "status" => true,

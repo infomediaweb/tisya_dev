@@ -270,7 +270,7 @@
                 <td align="center" style="padding: 20px 30px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #cccccc;">
                     <a href="{{ route('index') }}">
                         <img 
-                            src="https://tisya.tempsite.in/assets/images/logo.png" 
+                            src="{{asset('assets/images/logo.png')}}" 
                             alt="Logo" 
                             width="180" 
                             height="46" 
@@ -289,8 +289,10 @@
                      <p><strong>Name:</strong> {{ $data['name'] }}</p>
                      <p><strong>Email Address:</strong> {{ $data['email'] }}</p>
                      <p><strong>Mobile Number:</strong> {{ $data['phone'] }}</p> 
-                     <p><strong>Date:</strong> {{ $data['check-in'] }}</p> 
-                       <p><strong>Date:</strong> {{ $data['check-out'] }}</p> 
+                     <p><strong>Check In:</strong> {{ $data['check-in'] }}</p> 
+                      <p><strong>Check Out:</strong> {{ $data['check-out'] }}</p> 
+                      <p><strong>No of People:</strong> {{ $data['no-of-people'] }}</p> 
+                      <p><strong>Budget(Per Night):</strong> {{ $data['budget'] }}</p> 
                  </td>                
              </tr>
             

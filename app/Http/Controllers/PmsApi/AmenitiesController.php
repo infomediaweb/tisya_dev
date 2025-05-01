@@ -369,7 +369,6 @@ class AmenitiesController extends Controller
             }
         }
     }
-    
     public function updateShowOnFilter(Request $request, $id){
 
         try{
@@ -399,4 +398,6 @@ class AmenitiesController extends Controller
             ], 500);
         }
     }
+    
+    
 }

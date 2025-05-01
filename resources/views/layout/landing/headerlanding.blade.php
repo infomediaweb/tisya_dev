@@ -6,8 +6,8 @@
                     <div class="container">
                         <div class="row align-items-center align-items-center">
                             <div class="col-auto">
-                                <a class="logo text-primary">
-                                <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 297.79 77.14">                                    
+                                <div class="logo text-primary">
+                                    <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 297.79 77.14">                                    
                                     <g id="tisya">
                                         <g id="Layer_1-2" data-name="Layer 1">
                                         <g id="star">
@@ -25,7 +25,7 @@
                                         </g>
                                     </g>
                                     </svg>
-                                </a>
+                                </div>
                             </div>
                             <!--<div class="col text-end"><a href="" class="btn btn-primary">Book Now</a></div>-->
                             <div class="col text-end"><a href="tel:8799915100" class="text-decoration-none fw-bold"><i class="bi bi-telephone"></i> 8799915100</a></div>

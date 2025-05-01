@@ -275,6 +275,7 @@ class BookingController extends Controller{
                 'max'=>$property->maximum_number_of_guests
             )
         );
+       // $total_price = 1;
         return view('frontend.property_details', compact('property', 'guestOptions', 'propertyUnavailableDates', 'checkInDate', 'checkOutDate', 'total_guest_count', 'no_of_nights', 'total_price'));
     }
 
@@ -334,7 +335,7 @@ class BookingController extends Controller{
     
     
     public function savePropertyBookingWebsite(Request $request){
-       
+       // dd($request);
         $validator = Validator::make($request->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
@@ -378,8 +379,7 @@ class BookingController extends Controller{
             $propertyBooking->type = 'location';
             $propertyBooking->no_of_children = $request->childrenCount;
             $propertyBooking->no_of_adult = $request->adultsCount;
-            $propertyBooking->customer_detail = json_encode(array('first_name'=>$request->first_name, 'last_name'=>$request->last_name, 
-            'email'=>$request->email , 'country_code'=>$request->country_code, 'mobile_number'=>$request->phone_number, 'state'=>$request->state, 'city'=>$request->city));
+            $propertyBooking->customer_detail = json_encode(array('first_name'=>$request->first_name, 'last_name'=>$request->last_name, 'email'=>$request->email , 'country_code'=>$request->country_code, 'mobile_number'=>$request->phone_number, 'state'=>$request->state, 'city'=>$request->city , 'address'=>$request->address));
             $propertyBooking->checkin_date = date('Y-m-d', strtotime($request->ci_date));
             $propertyBooking->checkout_date = date('Y-m-d', strtotime($request->co_date)); 
             $propertyBooking->per_night_price = str_replace(',', '', $request->price_per_night_num_formatted);
@@ -436,6 +436,7 @@ class BookingController extends Controller{
         $orderId = $request->query('orderId');
         $razorpay_order_id = base64_decode($orderId);
         $PropertyBooking_data  = PropertyBooking::with('property.homeImageVideo')->where('razorpay_order_id', $razorpay_order_id)->first();
+       
         $prorpertyAssetsDetail = TblHomeImageVideo::where('home_id', $PropertyBooking_data->property_id)->where('type', 'image')->first();
         $location_data = TblLocation::with('property.homeImageVideo')
         ->where('tbl_location.status', 1)
@@ -445,17 +446,28 @@ class BookingController extends Controller{
         $home_footer_banner->list_content = json_decode($home_footer_banner->list_content, true); // Pass true for associative array
         return $home_footer_banner;
         });
-        $pagename = 'booking-confirmation.php';
+        blockPropertyAvailabilityInRu($PropertyBooking_data->property->ru_property_id, date('y-m-d', strtotime($PropertyBooking_data->checkin_date)) , date('y-m-d', strtotime($PropertyBooking_data->checkout_date)));
         $guest_data = "";
-       
-       if (is_string($PropertyBooking_data->customer_detail)) {
+         $pagename = 'booking-confirmation.php';
+        if (is_string($PropertyBooking_data->customer_detail)) {
             $customerDetails = json_decode($PropertyBooking_data->customer_detail, true);
         } else {
             $customerDetails = $PropertyBooking_data->customer_detail; // Assume it's already an array
         }
         $email = is_array($customerDetails) ? $customerDetails['email'] : $customerDetails->email;
-        Mail::to($email)->send(new BookingConfirmationEmail(array('mailData'=>$PropertyBooking_data, 'type'=>'customer')));
+        Mail::to($email)->send(new BookingConfirmationEmail(array('bookingDetail'=>$PropertyBooking_data->load('property'), 'id'=>$PropertyBooking_data->id, 'type'=>'customer')));
+        Mail::to('reservations@tisyastays.com')->send(new BookingConfirmationEmail(array('bookingDetail'=>$PropertyBooking_data->load('property'), 'id'=>$PropertyBooking_data->id, 'type'=>'customer')));;
+       
+        // dd($ruResponse);
         
+        $booking  = PropertyBooking::with(['home', 'property'])->where('razorpay_order_id', $razorpay_order_id)->first();
+        $ruResponse = MasterHelper::makeXmlRequest(reservationXmlRequest($booking));
+        if(isset($ruResponse['data']['ReservationID'])  && $ruResponse['data']['ReservationID'] !="0"){
+            PropertyBooking::where('id', $booking->id)->update(['booking_id'=>$ruResponse['data']['ReservationID']]);
+        }
+        else{
+          PropertyBooking::where('id', $booking->id)->update(['ru_response'=>json_encode($ruResponse, true)]); 
+        }
         return view('frontend.booking.thankyou',  compact('guest_data', 'prorpertyAssetsDetail', 'PropertyBooking_data', 'pagename', 'location_data','home_footer_banners'));
         
     }

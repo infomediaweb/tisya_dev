@@ -10,7 +10,9 @@
                 <button class="btn form-select text-start search-field" type="button"  data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,5"  data-bs-display="static" data-search-id="location">
                     <span class="data-text data-text-location-sec">{{ $location_name ?? 'Location' }} </span>
                     <input type="hidden" id="locationID_sec" value="{{ $filter_type ?? '' }}" name="locationID_sec">
-                    <input type="hidden" id="location_id_sec" value="{{ $location_name ?? '' }}" name="location_id_sec">
+                    <input type="hidden" id="location_id_sec" value="" name="location_id_sec">
+                    <!--<input type="hidden" id="location_id_sec" value="{{ $location_name ?? '' }}" name="location_id_sec">-->
+                    <input type="hidden" id="designation_sec" value="{{ $location_name ?? '' }}" name="designation_sec">
                     <input type="hidden" id="checkin_date_sec" value="{{ $checkin_date ?? '' }}" name="checkin_date_sec">
                     <input type="hidden" id="checkout_date_sec" value="{{ $checkout_date ?? '' }}"  name="checkout_date_sec">
                 </button>
@@ -18,7 +20,7 @@
                    <ul class="list-unstyled mb-0">
                     @foreach($states_with_locations as $state)
                                 <li class="li-heading">
-                                    <a class="location-item-sec" href="#" data-locidSec="{{ $state->name ?? '' }}" data-locationid="state" data-locationname="{{ $state->name ?? '' }}">
+                                    <a class="location-item-sec" href="#" data-locidSec="" data-locationid="state" data-locationname="{{ $state->name ?? '' }}">
                                         {{ $state->name ?? '' }} (All Properties)
                                     </a>
                                 </li>
@@ -222,11 +224,13 @@
         const dataTextSpan = document.querySelector('.data-text-location-sec'); 
         const locationIDField = $('#locationID_sec')
         const location_id_sec = $('#location_id_sec')
+        const designationSec = $('#designation_sec')
         dropdownItems.forEach(item => {
             item.addEventListener('click', function (event) {
                 event.preventDefault(); 
                 const locationName = this.getAttribute('data-locationname'); 
                 dataTextSpan.textContent = locationName; 
+                designationSec.val(locationName);
                 const locationID = this.getAttribute('data-locationid');
                 locationIDField.val(locationID); 
                 const locatIDSec = this.getAttribute('data-locidSec');
@@ -250,6 +254,8 @@
         $('.adultsCountSec').val() > 1 
             ? $('[data-type-sec="adults"][data-minus-sec]').removeClass('disabled') 
             : $('[data-type-sec="adults"][data-minus-sec]').addClass('disabled');
+            
+        
         updateTotalGuestsSec();
     }
 
@@ -280,6 +286,15 @@
         // if (dataType === 'children') {
         //     inputValue >= 2 ? plusEl.addClass('disabled') : plusEl.removeClass('disabled');
         // }
+      
+        if(dataType === 'children' && inputValue >= 4){
+            $('[data-type-sec="children"][data-plus-sec]').addClass('disabled');
+        }
+        else{
+            $('[data-type-sec="children"][data-plus-sec]').removeClass('disabled');
+        }
+        
+        
         updateTotalGuestsSec();
     }
     function updateTotalGuestsSec() {
@@ -303,6 +318,7 @@
             const location_name_sec  = $('.data-text-location-sec').text();
             const locationID_sec  = $('#locationID_sec').val();
             const location_id_sec  = $('#location_id_sec').val();
+            const designation_sec  = $('#designation_sec').val();
             const checkin_date_sec  = $('#checkin_date_sec').val();
             const checkout_date_sec  = $('#checkout_date_sec').val();
 
@@ -311,14 +327,14 @@
            // const totalGuestSec = Number(adultsCountSec) + Number(childrenCountSec);
             const totalGuestSec = Number(adultsCountSec);
 
-            if(location_name_sec ==''){
+            if(designation_sec ==''){
                 alert('Please Select Destination');
                 return false;
             }else{
                 const data = {
                     location_name: location_name_sec,
                     filter_type: locationID_sec,
-                    location: location_id_sec,
+                   // location: location_id_sec,
                     type: 'listPropertiesSearch',
                     checkin_date: checkin_date_sec,
                     checkout_date: checkout_date_sec,
@@ -326,6 +342,11 @@
                     childrenCount: childrenCountSec,
                     total_guests: totalGuestSec,
                 };
+                
+                if (location_id_sec !== '') {
+                    data.location = location_id_sec;  
+                }
+                
                 dynamicAjaxRequestSec(data);
             }  
         });

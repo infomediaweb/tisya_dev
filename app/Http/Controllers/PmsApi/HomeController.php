@@ -31,19 +31,8 @@ use App\Models\TblTag;
 use App\Models\TblHomeCollection;
 use App\Models\TblHomeTags;
 use App\Models\TblReviewImages;
-use App\Services\HyperGuestService;
-use Carbon\Carbon;
-
 class HomeController extends Controller
 {
-    
-    protected $hyperguest;
-
-    public function __construct(HyperGuestService $hyperguest)
-    {
-        $this->hyperguest = $hyperguest;
-    }
-    
     /**
      * Display a listing of the resource.
      */
@@ -62,7 +51,7 @@ class HomeController extends Controller
                     $query->where('home_name', 'like', $search . '%')
                           ->orWhere('location', 'like', $search . '%')
                           ->orWhere('state', 'like', $search . '%')
-                           ->orWhere('internal_name', 'like', $search . '%');
+                          ->orWhere('internal_name', 'like', $search . '%');
                 });
             }
             $perPage = $request->has('take') ? $request->get('take') : 20;
@@ -181,11 +170,7 @@ class HomeController extends Controller
             $SQL->short_direction = $request->short_direction;
             $SQL->direction_how_to_get_there = $request->direction_how_to_get_there;
             $SQL->house_rules = $request->house_rules;
-            
             $SQL->cancellation_policy = $request->cancellation_policy;
-            
-            $SQL->hyper_guest_id = $request->hyper_guest_id;
-            $SQL->hyper_per_night_price = $request->hyper_per_night_price;
             // $SQL->max_number_of_nights       = $request->max_number_of_nights;
             $SQL->checkin_time  = $request->arrival_time;
             $SQL->checkout_time = $request->departure_time;
@@ -226,34 +211,6 @@ class HomeController extends Controller
                     ]);
                 }
             }
-            
-            
-            // hyperguest code
-            $hotelCode = $request->hyper_guest_id;
-            $start = Carbon::today();
-            $end = Carbon::today()->addMonths(6);
-            $invTypeCode = 'DBL';
-            $ratePlanCode = 'BB';
-            $amountAftertax = $request->hyper_per_night_price;
-    
-            // Availiblity push
-            $response = $this->hyperguest->availibityPush(
-                $hotelCode,
-                $start->format('Y-m-d'),
-                $end->format('Y-m-d'),
-                $invTypeCode,
-                $ratePlanCode
-            );
-            
-            // Rate Push
-            $response = $this->hyperguest->ratePush(
-                $hotelCode,
-                $start->format('Y-m-d'),
-                $end->format('Y-m-d'),
-                $invTypeCode,
-                $ratePlanCode,
-                $amountAftertax
-            );
        
 
             return response([
@@ -358,9 +315,9 @@ class HomeController extends Controller
              $validator = Validator::make($request->all(), [
                 'home_name' => 'required',
                 'home_type_id' => 'required',
+                'internal_name' => 'required',
                 'state_id' => 'required',
                 'location_id' => 'required',
-                'internal_name' => 'required',
                 'short_direction' => 'required',
                 'no_of_bedrooms' => 'required',
                 'guests_included' => 'required',
@@ -449,15 +406,10 @@ class HomeController extends Controller
              
             // $SQL->collection_id              = $collection_id;
             // $SQL->collection                 = $collection_name;
-             
-             
-             $SQL->hyper_guest_id                = $request->hyper_guest_id;
-             $SQL->hyper_per_night_price         = $request->hyper_per_night_price;
-             
+             $SQL->internal_name                = $request->internal_name;
              $SQL->short_description          = $request->short_description;
              $SQL->description                = $request->description;
              $SQL->location_info              = $request->location_info;
-             $SQL->internal_name              = $request->internal_name;
              $SQL->short_direction            = $request->short_direction;
              $SQL->direction_how_to_get_there = $request->direction_how_to_get_there;
              $SQL->house_rules                = $request->house_rules;
@@ -485,33 +437,6 @@ class HomeController extends Controller
              $SQL->meta_description           = !empty($request->meta_description) ? $request->meta_description : $request->home_name;
              $SQL->meta_keyword               = !empty($request->meta_keywords) ? $request->meta_keywords : $request->home_name;
              $SQL->save();
-             
-            // hyperguest code
-            $hotelCode = $request->hyper_guest_id;
-            $start = Carbon::today();
-            $end = Carbon::today()->addMonths(6);
-            $invTypeCode = 'DBL';
-            $ratePlanCode = 'BB';
-            $amountAftertax = $request->hyper_per_night_price;
-    
-            // Availiblity push
-            $response = $this->hyperguest->availibityPush(
-                $hotelCode,
-                $start->format('Y-m-d'),
-                $end->format('Y-m-d'),
-                $invTypeCode,
-                $ratePlanCode
-            );
-            
-            // Rate Push
-            $response = $this->hyperguest->ratePush(
-                $hotelCode,
-                $start->format('Y-m-d'),
-                $end->format('Y-m-d'),
-                $invTypeCode,
-                $ratePlanCode,
-                $amountAftertax
-            );
 
             return response()->json([
                     'status' => true,
@@ -1473,6 +1398,7 @@ public function updateOnlyForEnquiry(Request $request, $id){
         ], 500);
     }
 }
+
 public function getReviewImage() {
     try {
         
@@ -1491,7 +1417,6 @@ public function getReviewImage() {
         ], 500);
     }
 }
-
 
 
 }

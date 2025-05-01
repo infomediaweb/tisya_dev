@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
-class TblHomeBanner extends Model{
+class TblHomeBanner extends Model
+{
     use HasFactory, SoftDeletes;
     protected $guarded = [];
     

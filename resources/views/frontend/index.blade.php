@@ -1,5 +1,10 @@
 @extends('layout.main')
 @section('content')
+<style>
+    .section.section-hero:has(.hero-banner-swiper) .section-bg:before{
+        background:linear-gradient(to bottom, rgba(0, 0, 0, 0.20) 0%, rgba(0, 0, 0, 0) 100%);
+    }
+</style>
     <section class="section flex-wrap section-hero section-bg">
          @if(!empty($home_banner->homeBannerImage) && $home_banner->homeBannerImage->isNotEmpty())
             <div class="section-bg">
@@ -99,7 +104,8 @@
                                                 {{ $firstTag->tags_name }}
                                             </a>
                                         @endif
-                                        <div class="card-body">
+                                        <div class="card-body" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key ]) }}', '_blank');" 
+                                        style="cursor: pointer;">
                                             <div class="row">
                                                 <div class="card-title h4 mb-0">{{ $property->home_name }}</div>
                                                 <div class="location-state">
@@ -110,7 +116,8 @@
                                                 {{-- <div class="price">From &#8377;{{ number_format($property->pl_price->nightly_rate) }} / night</div> --}}
                                             </div>
                                         </div>
-                                        <div class="card-footer">
+                                        <div class="card-footer" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key ]) }}', '_blank');" 
+                                        style="cursor: pointer;">
                                             <ul class="nav property-short-info">
                                                 <li><span class="icon-users"></span>Upto {{ $property->maximum_number_of_guests == 1 ? $property->maximum_number_of_guests . ' Guest' : $property->maximum_number_of_guests . ' Guests' }}</li>
                                             <li><span class="icon-bed"></span>{{ $property->no_of_bedrooms == 1 ? $property->no_of_bedrooms . ' Room' : $property->no_of_bedrooms . ' Rooms' }}</li>
@@ -193,7 +200,8 @@
                                                 {{ $firstTag->tags_name }}
                                             </a>
                                         @endif
-                                        <div class="card-body">
+                                        <div class="card-body" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key ]) }}', '_blank');" 
+                                        style="cursor: pointer;">
                                             <div class="row">
                                                 <div class="card-title h4 mb-0">{{ $property->home_name }}</div>
                                                 <div class="location-state">
@@ -204,7 +212,8 @@
                                                 {{-- <div class="price">From &#8377;{{ number_format($property->pl_price->nightly_rate) }} / night</div> --}}
                                             </div>
                                         </div>
-                                        <div class="card-footer">
+                                        <div class="card-footer" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key ]) }}', '_blank');" 
+                                        style="cursor: pointer;">
                                             <ul class="nav property-short-info">
                                                 <li><span class="icon-users"></span>Upto {{ $property->maximum_number_of_guests == 1 ? $property->maximum_number_of_guests . ' Guest' : $property->maximum_number_of_guests . ' Guests' }}</li>
                                             <li><span class="icon-bed"></span>{{ $property->no_of_bedrooms == 1 ? $property->no_of_bedrooms . ' Room' : $property->no_of_bedrooms . ' Rooms' }}</li>
@@ -551,7 +560,8 @@
                             <div class="swiper-wrapper">   
                              @foreach ($locations as $location)
                                 <div class="swiper-slide">
-                                    <a href="{{ route('location-property', ['slug_location' => $location->location_name]) }}" class="card card-destinations">
+                                    <!--<a href="{{ route('location-property', ['slug_location' => $location->location_name]) }}" class="card card-destinations">-->
+                                    <a href="{{ route('property-list', ['location_name' => $location->location_name, 'location' => $location->location_name, 'filter_type' => 'location', 'type' => 'listPropertiesSearch']) }}" class="card card-destinations">
                                         <div class="img-destinations">
                                              <img loading="lazy" 
                                            src="{{ asset('storage/home/images/'.$location->image ?? 'assets/images/d1.jpg') }}" >
@@ -756,7 +766,7 @@
                 <!--        </div>      -->
                 <!--    </div>-->
                 <!--</div>-->
-                <div class="row justify-content-center mt-4 pt-3 d-none d-lg-flex">
+                <div class="row justify-content-center mt-4 pt-3 d-lg-flex">
                     <div class="col-auto position-relative">
                         <button class="btn p-0 swiper-outer-prev"><span class="icon-arrow-left"></span></button>
                     </div>

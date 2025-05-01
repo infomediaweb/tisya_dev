@@ -36,6 +36,7 @@ use App\Http\Controllers\MinStayController;
 use App\Models\PropertyBooking;
 use DB;
 use DateTime;
+use Carbon\Carbon;
 
 
 class IndexController extends Controller{
@@ -511,20 +512,45 @@ public function stateAllProperty(Request $request, $state){
             $minStayController = new MinStayController();
             $minStayArray = $minStayController->syncMinStayFromTo(date('Y-m-d'), $property->id);
             
-            $previouslyBookedCheckoutDates = PropertyBooking::where('property_id', $property->id)->where('checkout_date', '>=', date('Y-m-d'))->where('property_booking_status', 'Confirmed')->pluck('checkout_date')->toArray();
-
+            $previouslyBookedCheckoutDates = PropertyBooking::where('property_id', $property->id)->where('checkout_date', '>=', date('Y-m-d'))->where('property_booking_status', '!=', 'Canceled')->pluck('checkout_date')->toArray();
+           
+           
+            $ac = array();
+            foreach ($previouslyBookedCheckoutDates as $checkoutDate) {
+                $checkin = PropertyBooking::where('property_id', $property->id)
+                    ->where('checkin_date', $checkoutDate) // corrected spelling here
+                    ->where('property_booking_status', '!=', 'Canceled')
+                    ->first();
+                if ($checkin) {
+                    array_push($ac, $checkoutDate);
+                }
+            }
+            $previouslyBookedCheckoutDates = array_values(array_diff($previouslyBookedCheckoutDates, $ac));
+          
             $totalReviews = $property->homeReviews->count();
             
+           
             
+            //---------------add future dates for block----------------//
+            $lastDate = Carbon::parse(max($propertyUnavailableDates));
+            $startDate = $lastDate->copy()->addDay();
+            $endDate = $lastDate->copy()->addYears(5);
+            
+            $futureDates = [];
+            while ($startDate <= $endDate) {
+                $futureDates[] = $startDate->toDateString();
+                $startDate->addDay();
+            }
+            $propertyUnavailableDates = array_merge($propertyUnavailableDates, $futureDates);
             
 
             return view('frontend.properties.property-detail', compact('property', 'no_of_nights', 'totGuest', 'adult', 'child', 'checkInDate', 'checkOutDate', 'propertyUnavailableDates', 'minStayArray', 'previouslyBookedCheckoutDates',
-            'location_name', 'checkin_date', 
-            'checkout_date', 'city_id', 
-            'total_guests', 'adultsCount', 
-            'childrenCount', 'guestCount',
-            'totalReviews',
-            'isBookingEnable'
+                'location_name', 'checkin_date', 
+                'checkout_date', 'city_id', 
+                'total_guests', 'adultsCount', 
+                'childrenCount', 'guestCount',
+                'totalReviews',
+                'isBookingEnable'
             ));
 }
 
@@ -577,6 +603,7 @@ public function PropertyPriceFilter(Request $request){
 
       
         $extra_guest_charge = 0;
+        $extra_no_of_guest  = 1;
         if($noOfGuest >$property->guests_included && $noOfGuest <= $property->maximum_number_of_guests){
             if($property->maximum_number_of_guests == $noOfGuest){
                 $extra_no_of_guest = $property->maximum_number_of_guests - $property->guests_included;
@@ -623,7 +650,7 @@ public function PropertyPriceFilter(Request $request){
         //$price = 1;
         return response()->json([
             'status' => true,
-            'data' => array('base_price'=>round($base_price), 'extra_guest_charge'=>round($property->extra_guest_charges), 'total_extra_guest_charge'=>round($extra_guest_charge), 'total_price'=>round($price), 'tax_amount'=>number_format(round($tax_amount)), 'tax'=>$tax, 'num_formatted_tot_price'=>number_format(round($price)), 
+            'data' => array('extra_no_of_guest'=>$extra_no_of_guest, 'base_price'=>round($base_price), 'extra_guest_charge'=>round($property->extra_guest_charges), 'total_extra_guest_charge'=>round($extra_guest_charge), 'total_price'=>round($price), 'tax_amount'=>number_format(round($tax_amount)), 'tax'=>$tax, 'num_formatted_tot_price'=>number_format(round($price)), 
         
         'total_price_multiple'=>number_format(round($total_price_multiple)),
         'additional_charges_name' =>$additional_charges_name,
@@ -845,6 +872,11 @@ public function applyBookingCouponCode(Request $request){
         //  return view('frontend.booking.property-booking', compact('property','requestParameters'));
         
         $property = TblHome::with('additionalCharge')->where('id', $request->id)->first();
+        
+        if (!$property) {
+            abort(404);
+        }
+        
         $requestParameters = $request->all();
         $count = DB::table("ru_property_availabilities")
                             ->where("ru_property_id", $property->ru_property_id)
@@ -1289,7 +1321,7 @@ private function listTagBasedProperty(Request $request)
 private function listPropertiesSearch(Request $request)
 {
     $params = $this->getRequestParams($request);
-   
+    //dd($params);
     $guestCount = $params['total_guests'] ?? 1;
 
     $query = TblHome::where('status', 1);
@@ -1346,9 +1378,9 @@ private function listPropertiesSearch(Request $request)
         $onTopPropertyIdArray = $query->pluck('id')->toArray();
     }
 
-  
+
     if ($request->checkin_date && $request->checkout_date) {
-        
+       // dd($params['checkin_date']);
         $checkin_date_formatted = DateTime::createFromFormat('jS M Y', $params['checkin_date'])->format('Y-m-d');
         $checkout_date_formatted = DateTime::createFromFormat('jS M Y', $params['checkout_date'])->format('Y-m-d');
 
@@ -1363,12 +1395,10 @@ private function listPropertiesSearch(Request $request)
                     'location_id'   => $location_id,
                 ];
                 $AllPropertyArray = propertyList($search_parameters);
-                
-              
             }
         }
         else if ($request->filter_type == 'state') {
-            $state = TblState::where('name', 'like', $request->location)->first();
+            $state = TblState::where('name', 'like', $request->location_name)->first();
             $locations = TblLocation::where('state_id', $state->id)->get()->pluck('id')->toArray();
         
             if ($locations) {
@@ -1388,17 +1418,14 @@ private function listPropertiesSearch(Request $request)
             //     $q->whereDate('available_from', '<=', $checkin_date_formatted)
             //       ->whereDate('available_to', '>=', $checkout_date_formatted);
             // });
-         
             $onTopPropertyIdArray = $query->pluck('id')->toArray();
            // $AllPropertyArray = propertyListByLocation($onTopPropertyIdArray, $guestCount);
-            $min_price = $request->has('min_price') ? (int)$request->min_price : null;
+           $min_price = $request->has('min_price') ? (int)$request->min_price : null;
             $max_price = $request->has('max_price') ? (int)$request->max_price : null; 
             $AllPropertyArray = propertyListByLocationFilter($onTopPropertyIdArray, $guestCount, $min_price, $max_price);
-            
-             dd($AllPropertyArray);
         }
     } else {
-        // 🔹 If no date filter, fetch properties normally
+        // ðŸ”¹ If no date filter, fetch properties normally
         $onTopPropertyIdArray = $query->pluck('id')->toArray();
         //$AllPropertyArray = propertyListByLocation($onTopPropertyIdArray, $guestCount);
         $min_price = $request->has('min_price') ? (int)$request->min_price : null;
@@ -1406,18 +1433,18 @@ private function listPropertiesSearch(Request $request)
         $AllPropertyArray = propertyListByLocationFilter($onTopPropertyIdArray, $guestCount, $min_price, $max_price);
     }
 
-    // 🔹 Sort Properties by Price (High-to-Low or Low-to-High)
+    // ðŸ”¹ Sort Properties by Price (High-to-Low or Low-to-High)
     $AllPropertyArray = collect($AllPropertyArray)->sortBy(
         fn($property) => $params['sortOrder'] === 'high_to_low' ? -$property->per_night_price : $property->per_night_price
     )->values()->all();
 
-    // 🔹 Get Total Properties Count
+    // ðŸ”¹ Get Total Properties Count
     $totalStays = count($AllPropertyArray);
 
-    // 🔹 Paginate Results
+    // ðŸ”¹ Paginate Results
     $properties = $this->paginateArray($AllPropertyArray, $params['page'], $params['defaultPerPage']);
     $propertyCount = count($properties);
-    // 🔹 Return View with Filtered Properties
+    // ðŸ”¹ Return View with Filtered Properties
     return view('frontend.properties.property-list', array_merge($params, compact('properties', 'totalStays','propertyCount')));
 }
 
@@ -1684,23 +1711,25 @@ private function paginateArray($items, $currentPage, $perPage)
 function ajaxFilterProperties(Request $request){
         
         $query = TblHome::query();
-        if ($request->has('property_type') && $request->property_type !== 'propertyType') {
+        if ($request->has('property_type') && $request->property_type != 'propertyType') {
           $selectedTypes = explode(',', $request->input('property_type')); 
           $homeType_id = TblHomeType::whereIn('url_key', $selectedTypes)->get()->pluck('id')->toArray();
           $query->whereIn('home_type_id', $homeType_id);
         }
     
 
-        if ($request->has('location') && $request->location !== 'all' && empty($request->filter_type)) {
+        if ($request->has('location') && $request->location != 'all' && empty($request->filter_type) ) {
             $selectedLocations = explode(',', $request->input('location'));
             $locations = TblLocation::whereIn('location_name', $selectedLocations)->get()->pluck('id')->toArray();
             $query->whereIn('location_id', $locations);
           
         }
 
-        
+        if ($request->has('total_guests') && $request->total_guests > 1 ) {
+            $query->where('maximum_number_of_guests', '>=', $request->total_guests);
+          
+        }
 
-        
         if ($request->has('amenities')) {
             $selectedAmenities = explode(',', $request->input('amenities'));
             $query->whereHas('homeAmenities', function ($q) use ($selectedAmenities) {
@@ -1708,12 +1737,10 @@ function ajaxFilterProperties(Request $request){
             });
         }
 
-       
         if ($request->has('rooms')) {
             $query->where('no_of_bedrooms', '>=', $request->input('rooms'));
         }
 
-        
         if ($request->has('tag_name')) {
             $getTag = TblTag::where('tags_name', $request->tag_name)->first();
             if (!$getTag) {
@@ -1730,8 +1757,6 @@ function ajaxFilterProperties(Request $request){
             $query->whereIn('id', $homeIds);
         }
 
-       
-      
         if($request->has('filter_name') && $request->has('type') && $request->has('type') == 'listCollectionBasedProperty'){
             $collection = TblCollection::where('collection_name', $request->filter_name)->first();
             $homeIdsFromCollection = TblHomeCollection::where('collection_id', $collection->id)->pluck('home_id');
@@ -1746,36 +1771,26 @@ function ajaxFilterProperties(Request $request){
             $query->whereIn('location_id', $locations);
         }
         
-        
-
         if ($request->filter_type == 'state') {
-          
            // $states = TblState::where('name', $request->input('location'))->first();
            // $query->where('state_id', $states->id);
            
-           $states = TblState::where('name', $request->input('location_name'))->first();
+            $states = TblState::where('name', $request->input('location_name'))->first();
             $selectedLocations = explode(',', $request->input('location'));
-            if ($request->has('location') && !empty($request->input('location'))) {
+            if ($request->has('location') && !empty($request->input('location') && $request->location !='all')) {
                 $locations = TblLocation::where('state_id', $states->id)
                     ->whereIn('location_name', $selectedLocations)
                     ->pluck('id')
                     ->toArray();
-            } else {
+            }
+            else {
                 $locations = TblLocation::where('state_id', $states->id)
                     ->pluck('id')
                     ->toArray();
             }
             $query->whereIn('location_id', $locations);
-           
-           
         }
-
         $list = $query->with(['images', 'locationData','tags'])->where('status', 1)->whereNull('deleted_at')->get();
-
-       
-       
-
-        
 
         $properties = [];
         foreach ($list as $property) {
@@ -1820,7 +1835,6 @@ function ajaxFilterProperties(Request $request){
                 $price = RuPropertyPrice::where('ru_property_id', $property->ru_property_id)->whereBetween('price_date', [date('Y-m-d', strtotime($checkInDate)),date('Y-m-d', strtotime(date('Y-m-d', strtotime($checkOutDate)). '-1 days'))])->sum('price');
                 $price = $price/$date_difference_count;
                 
-                  
                 if($price > 0 && $count == 0 ){
                     if(setting()->website_markup){   
                         $price = $price +  ($price*setting()->website_markup)/100;
@@ -1828,13 +1842,12 @@ function ajaxFilterProperties(Request $request){
                     $pricea[] = $price;
                     $property->pl_price = $price;
                     
-                    if($price >= (integer)$request->minPrice  ){
+                    if($price >= (integer)$request->minPrice){
                         $properties[] = $property;
                     }
                 }
             }
             else{
-            
                 $propertyCheckInDate = DB::table('ru_property_availabilities')->where('ru_property_id', $property->ru_property_id)->where('is_available', 'yes')->where('availability_date', '>=', date('Y-m-d'))->orderBy('availability_date', 'asc')->first();
                 
                 if(isset($propertyCheckInDate->availability_date)){
@@ -1863,7 +1876,6 @@ function ajaxFilterProperties(Request $request){
                 $price = RuPropertyPrice::where('ru_property_id', $property->ru_property_id)->whereBetween('price_date', [date('Y-m-d', strtotime($checkInDate)),date('Y-m-d', strtotime(date('Y-m-d', strtotime($checkOutDate)). '-1 days'))])->sum('price');
                 $price = $price/$date_difference_count;
                 
-            
                 if($price > 0 ){
                     if(setting()->website_markup){   
                         $price = $price +  ($price*setting()->website_markup)/100;
@@ -1875,10 +1887,7 @@ function ajaxFilterProperties(Request $request){
                         $properties[] = $property;
                     }
                 }
-                
-                
             }
-          
         }
         $properties = collect($properties);
         if($request->has('min_price') && $request->has('max_price')){
@@ -2288,7 +2297,5 @@ function ajaxFilterProperties(Request $request){
         
         return view('frontend.landing', compact('properties','home_banner', 'propertiesApartment', 'footerHomeData','locations','reviews','addventures','blogs','specialoffers','collections'));
     }
-    
-
 
 }

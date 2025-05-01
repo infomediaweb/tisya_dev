@@ -24,7 +24,7 @@
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="">Review Type<span class="text-danger">*</span></label>
-                                <Field 
+                                <!-- <Field 
                                     as="select"
                                     name="review_type"
                                     class="form-control"
@@ -37,6 +37,22 @@
                                     <option value="Airbnb">Airbnb</option>
                                     <option value="Google">Google</option>
                                     <option value="Tisya">Tisya</option>
+                                </Field> -->
+
+                                <Field 
+                                    as="select"
+                                    name="review_type"
+                                    class="form-control"
+                                    :class="{'border-danger': errors.review_type}"
+                                    v-model="reviewEdit.review_type"
+                                    rules="required">
+                                    <option value="" selected disabled>Select Review Type</option>
+                                    <option 
+                                        v-for="(obj, index) in ReviewImageList" 
+                                        :key="index"
+                                        :value="obj.id">
+                                        {{ obj.review_name }}
+                                    </option>
                                 </Field>
                             </div>
                         </div>
@@ -96,7 +112,7 @@
                                 />
                             </div>
                         </div>
-                        <div class="col-12">
+                        <!-- <div class="col-12">
                             <div class="form-group">
                                 <label for="">Icon<span class="text-danger">*</span></label>
                                 <UploadFile 
@@ -115,7 +131,7 @@
                                     @emitDeleteUploadFile="deleteUploadFile(reviewEdit.id)"
                                 />
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="row">
@@ -176,13 +192,12 @@
                                             </td>
                                             <td>
                                                 <img
-                                                :src="obj.icon_url ? obj.icon_url : placeholder"
+                                                :src="obj.review_images && obj.review_images.icon_url ? obj.review_images.icon_url : placeholder"
                                                 height="20"
+                                                alt="Review Image"
                                             >
-                                               
-                                            
                                             </td>
-                                            <td>{{ obj.review_type }}</td>
+                                            <td>{{ obj && obj.review_images && obj.review_images.review_name }}</td>
                                             <td>{{ obj.guest_name }}</td>
                                             <td>{{ dayjs(obj.review_date).format('D MMM, YYYY') }}</td>
                                             <td class="text-center">{{ obj.rating }}</td>
@@ -250,7 +265,7 @@
     const vSelectCheckValue = ref([])
     const selectCheckRef = ref()
     const uploadFile = ref({})
-
+    const ReviewImageList = ref([])
     const isLoading = ref(false)
     const submitApiUrl = ref(null)
     const isSubmitLoading = ref(false)
@@ -318,7 +333,16 @@
         })
     }
 
-
+    const getReviewImage = () => {
+        axios.get('/api/review_image').then(res => {
+            if(res.data.status){
+                ReviewImageList.value = res.data.data
+                
+            }
+        }).catch(error => {
+            console.log(error);
+        })
+    }
     // For delete single item
     const deleteItem = (id) => {
         dialog('Are you sure you want to delete?', confirm).show()
@@ -377,7 +401,7 @@
             rating: v.review_rating,
             comment: v.comment,
             review_type: v.review_type,
-            icons_image: uploadFile.value.filename
+          ////  icons_image: uploadFile.value.filename
         }).then(res => {
             if(res.data.status){
                 editId.value ? toast('Successfully Updated.', 'success').show() : toast(res.data.message, 'success').show()
@@ -395,6 +419,7 @@
 
 
     onMounted(() => {
+        getReviewImage()
         //For get Review list 
         if(homeEdit.value.home_reviews?.length && route.params.id){
             nextTick(async () => {

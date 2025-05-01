@@ -54,6 +54,7 @@ class BecomeahostController extends Controller
     public function enquireSave(Request $request){
         $validator = Validator::make($request->all(), [
             'name' => 'required',
+            'phone' => 'required',
             'phone' => 'required|digits_between:6,12',
             'country_code' => 'required',
             'email' => 'required|string|email|max:255',
@@ -69,21 +70,57 @@ class BecomeahostController extends Controller
             $enquiryDetail['no_of_guest'] = $request->guest;
             $enquiryDetail['no_of_night'] = $request->tot_no_of_days;
             $enquiryDetail['name'] = $request->name;
-            $enquiryDetail['email'] = $request->email;
             $enquiryDetail['phone_no'] = $request->phone;
+            $enquiryDetail['email'] = $request->email;
             $enquiryDetail['enquiry_message'] = $request->message;
-            $enquiryDetail['country_code'] = $request->country_code;
             $enquiryDetail['total_amount'] = (integer)(str_replace(",", "", $request->total_price_multiple));
+            $enquiryDetail['country_code'] = $request->country_code;
             $enquiryDetail['checkin_date'] = $request->ci_date;
             $enquiryDetail['checkout_date'] = $request->co_date;
             BookingEnquiry::create($enquiryDetail);
             
-             Mail::to($admin)
+            Mail::to($admin)
             ->bcc($bccRecipients)
             ->send(new EnquireSaveEmail($request->all()));
             Mail::to($request->email)->send(new EnquireSaveEmailGuest($request->all()));
             
             DB::table('booking_guest_ids')->insert(['name'=>$request->name, 'email'=>$request->email, 'mobile_no'=>$request->phone]);
+            
+               // === SEND API to NEODOVE ===
+                $detailText = "Check-in: " . $request->ci_date . ", Check-out: " . $request->co_date . ", Property name: " . ($request->property_name ?? '');
+
+                $payload = [
+                    "name" => $request->name,
+                    "mobile" => $request->phone,
+                    "email" => $request->email,
+                    "detail" => $detailText,
+                    "detail2" => $request->message
+                ];
+
+                $curl = curl_init();
+                curl_setopt_array($curl, [
+                    CURLOPT_URL => "https://75703d54-e40e-4f16-8bb9-f49421778dd9.neodove.com/integration/custom/c41c7b2d-6baf-41fa-a38c-068abf9194bc/leads",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_CUSTOMREQUEST => "POST",
+                    CURLOPT_POSTFIELDS => json_encode($payload),
+                    CURLOPT_HTTPHEADER => [
+                        "Content-Type: application/json"
+                    ],
+                ]);
+
+                $response = curl_exec($curl);
+                $err = curl_error($curl);
+                curl_close($curl);
+
+                if ($err) {
+                    \Log::error('Neodove API Error: ' . $err);
+                } else {
+                    \Log::info('Neodove API Response: ' . $response);
+                }
+                // === END API ===
+            
+            
+            
             return response()->json([
                 'status' => true,
                 'message' => "Enquiry Successfully",

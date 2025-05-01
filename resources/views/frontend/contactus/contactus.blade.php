@@ -1,10 +1,6 @@
 @extends('layout.main')
 @section('content')
-@if(session('success'))
-    <div class="alert alert-success" id="success-message">
-        {{ session('success') }}
-    </div>
-@endif
+
 <section class="section become-a-host">
     <div class="container">
         <div class="row gy-5">
@@ -23,7 +19,7 @@
                             <h4 class="fw-bold text-primary">Contact</h4>
                             <p class="mb-1"><a class="text-decoration-none" href="tel:+91 87999 15100">+91 87999 15100</a>, <a class="text-decoration-none" href="tel:+91 87999 14701">+91 87999 14701</a></p>
                             <p class="mb-1"><a class="text-decoration-none" href="mailto:reservations@tisyastays.com">reservations@tisyastays.com</a></p>
-                            <p class="mb-1"><span>Time : </span>9:30 to 6:30</p>
+                            <p class="mb-1"><span>Time : </span>9:30 AM to 6:30 PM</p>
                         </div>
                     </div>
                     <div class="row gx-3">
@@ -40,6 +36,15 @@
                 </div>
             </div>
             <div class="col-12 col-lg">
+                @if(session('success'))
+                    <div class="alert alert-success" id="success-message">
+                        {{ session('success') }}
+                    </div>
+                    <script>
+                        fbq('track', 'Contact', { content_name: 'Contact Form Submission', status: 'Submitted' });
+                        gtag('event', 'conversion', {'send_to': 'AW-16482594363/oLBgCMjMqpcaELvcwbM9'});
+                    </script>
+                @endif
                 <div class="form-box p-4 bg-white shadow rounded-4">
                      <h3 class="fw-bold text-primary mb-3">Contact Us</h3>
                     
@@ -149,7 +154,7 @@
     $(document).ready(function() {
         setTimeout(function() {
             $('#success-message').fadeOut();
-        }, 1000);  
+        }, 3000);  
     });
 </script>
 <script>

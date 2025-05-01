@@ -20,9 +20,8 @@ class TblLocation extends Model
         'meta_description',
         'meta_keyword'
     ];
-
-
-  public function state()
+    
+    public function state()
     {
         return $this->belongsTo(TblState::class, 'state_id', 'id');
     }
@@ -31,4 +30,5 @@ class TblLocation extends Model
     {
         return $this->hasMany(TblHome::class, 'location_id', 'id')->with(['price', 'images', 'imagesVideos', 'tags', 'amenities', 'homeAmenities',  'homeFeatures', 'homeReviews', 'additionalCharge', 'homeImageVideo']);
     }
+
 }

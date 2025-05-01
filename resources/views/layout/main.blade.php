@@ -12,7 +12,7 @@
 
 
 
-<body data-scroll-id="top" class="<?php echo ($pagename === "index" || $pagename === "becomeahost") ? 'home-page' : (($pagename === "list-detail") ? 'inner-page' :  (($pagename === "booking-confirmation") ? 'header-hide header-page' : 'inner-page header-page')); ?>">
+<body data-scroll-id="top" class="<?php echo ($pagename === "index" || $pagename === "becomeahost") ? 'home-page' : (($pagename === "list-detail") ? 'inner-page' :  (($pagename === "booking-confirmation") ? 'header-hide header-page' : 'inner-page header-page')); ?> @if($pagename=='property-detail') detail-page  @endif">
 
 
     <div class="wrapper clearfix">

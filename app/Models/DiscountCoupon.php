@@ -33,7 +33,7 @@ class DiscountCoupon extends Model{
         'prefix',
     ];
     
-     protected $appends = ['discount_percentage', 'discount_flat', 'coupon_code_self', 'coupon_code_auto', 'codes'];
+    protected $appends = ['discount_percentage', 'discount_flat', 'coupon_code_self', 'coupon_code_auto', 'codes'];
     protected $casts = [
         'property_type_id' => 'string',
         'property_id' => 'string',
@@ -102,4 +102,6 @@ class DiscountCoupon extends Model{
             return $this->code;
         }
     }
+    
+    
 }

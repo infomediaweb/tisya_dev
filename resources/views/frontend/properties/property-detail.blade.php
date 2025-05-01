@@ -5,75 +5,107 @@
         max-width: 70px;
         object-fit: contain;
     }
-    html {
-    scroll-behavior: smooth;
+    /*  add class calender */
+    .datepicker .datepicker__month-day--today {
+        background-color: transparent !important;
+        color: #00423c !important;
+        border-radius: 0 !important;
+    }
+
+    .datepicker .datepicker__month-day--today:hover {
+        background-color: transparent !important;
+        color: #00423c !important;
+        border-radius: 0 !important;
+    }
+     /* end add class calender */
+    
+    body, html{
+        overflow-x:hidden !important;
+    }
+    .page-wrapper{
+        overflow-x:hidden !important;
+    }
+    .tooltip {
+        z-index: 99999; /* Higher than Bootstrap modal (1050) */
+    }
+    .tooltip.bs-tooltip-top .tooltip-inner {
+        text-align: left;
+    }
+    .tooltip.bs-tooltip-top {
+        transform: translate(-50%, -100%) !important;
+        left: -50px !important; /* Moves tooltip to the left */
+    }
+    .offer-code .btn.active:after, .offer-code .btn.active:before {
+        visibility: visible;
+        opacity: 1;
+        z-index: 999999 !important;
     }
 </style>
     <div class="page-wrapper">
        
         
         @if($property->images->isNotEmpty()) 
-       <section class="section section-property-gallery d-none d-md-block pt-4">
-    <div class="container">
-        <div class="row g-equal-detail">
-            <!-- First Image -->
-            <div class="col-12 col-lg-6">
-                <a href="#" class="gallery-card" data-gallery-type="all">
-                    @php $firstImage = $property->images->first(); @endphp
-                    @if($firstImage)
-                        <img src="{{ asset($firstImage->medium_image ?? 'assets/images/noimage-property.jpg') }}" alt="Property Image">
-                    @else
-                        <img src="{{ asset('assets/images/noimage-property.jpg') }}" alt="No Image Available">
-                    @endif
-                </a>
-            </div>
-
-            <!-- Middle and Last Images -->
-            <div class="col-12 col-lg-6">
-                <div class="row g-equal-detail">
-                    @php
-                        $displayedImageIds = []; // Track displayed image IDs
-                        $firstImageId = $firstImage ? $firstImage->id : null;
-                        $lastImage = $property->images->last();
-                        $lastImageId = $lastImage ? $lastImage->id : null;
-                        $displayCount = 0; // Track middle images displayed
-                    @endphp
-
-                    <!-- Middle Images -->
-                    @foreach($property->images as $image)
-                        @if($image->id != $firstImageId && $image->id != $lastImageId && $displayCount < 3)
-                            <div class="col-6">
-                                <a href="#" class="gallery-card" data-gallery-type="all">
-                                    <img src="{{ asset($image->medium_image ?? 'assets/images/noimage-property.jpg') }}" alt="Property Image">
-                                </a>
+            <section class="section section-property-gallery d-none d-md-block pt-4">
+                <div class="container">
+                    <div class="row g-equal-detail">
+                        <!-- First Image -->
+                        <div class="col-12 col-lg-6">
+                            <a href="#" class="gallery-card" data-gallery-type="all">
+                                @php $firstImage = $property->images->first(); @endphp
+                                @if($firstImage)
+                                    <img src="{{ asset($firstImage->medium_image ?? 'assets/images/noimage-property.jpg') }}" alt="Property Image">
+                                @else
+                                    <img src="{{ asset('assets/images/noimage-property.jpg') }}" alt="No Image Available">
+                                @endif
+                            </a>
+                        </div>
+            
+                        <!-- Middle and Last Images -->
+                        <div class="col-12 col-lg-6">
+                            <div class="row g-equal-detail">
+                                @php
+                                    $displayedImageIds = []; // Track displayed image IDs
+                                    $firstImageId = $firstImage ? $firstImage->id : null;
+                                    $lastImage = $property->images->last();
+                                    $lastImageId = $lastImage ? $lastImage->id : null;
+                                    $displayCount = 0; // Track middle images displayed
+                                @endphp
+            
+                                <!-- Middle Images -->
+                                @foreach($property->images as $image)
+                                    @if($image->id != $firstImageId && $image->id != $lastImageId && $displayCount < 3)
+                                        <div class="col-6">
+                                            <a href="#" class="gallery-card" data-gallery-type="all">
+                                                <img src="{{ asset($image->medium_image ?? 'assets/images/noimage-property.jpg') }}" alt="Property Image">
+                                            </a>
+                                        </div>
+                                        @php
+                                            $displayedImageIds[] = $image->id;
+                                            $displayCount++;
+                                        @endphp
+                                    @endif
+                                @endforeach
+            
+                                <!-- Last Image -->
+                                <div class="col-6">
+                                    <div class="gallery-card">
+                                        @if($lastImage && !in_array($lastImageId, $displayedImageIds))
+                                            <img src="{{ asset($lastImage->medium_image ?? 'assets/images/noimage-property.jpg') }}" data-gallery-type="all" alt="Property Image">
+                                            <span class="seeAllPhoto btn btn-light" data-gallery-type="all" style="font-size: 13px; padding: 5px 15px">
+                                                Show all photos
+                                            </span>
+                                            @php $displayedImageIds[] = $lastImage->id; @endphp
+                                        @else
+                                            <img src="{{ asset('assets/images/noimage-property.jpg') }}" data-gallery-type="all" alt="No Image Available">
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
-                            @php
-                                $displayedImageIds[] = $image->id;
-                                $displayCount++;
-                            @endphp
-                        @endif
-                    @endforeach
-
-                    <!-- Last Image -->
-                    <div class="col-6">
-                        <div class="gallery-card">
-                            @if($lastImage && !in_array($lastImageId, $displayedImageIds))
-                                <img src="{{ asset($lastImage->medium_image ?? 'assets/images/noimage-property.jpg') }}" data-gallery-type="all" alt="Property Image">
-                                <span class="seeAllPhoto btn btn-light" data-gallery-type="all" style="font-size: 13px; padding: 5px 15px">
-                                    Show all photos
-                                </span>
-                                @php $displayedImageIds[] = $lastImage->id; @endphp
-                            @else
-                                <img src="{{ asset('assets/images/noimage-property.jpg') }}" data-gallery-type="all" alt="No Image Available">
-                            @endif
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
-@endif 
+            </section>
+        @endif 
         
         <!--- For Mobile -->
                @if($property->images->isNotEmpty())
@@ -415,7 +447,7 @@
                                 </a>
                             </li>
                             <li class="col-auto offer-code h-auto">
-                                <a href="javascript:void(0)" data-clipboard-text="{{url()->full()}}" class="btn border bg-transparent text-primary border-primary btn-outline-primary">
+                                <a href="javascript:void(0)" data-clipboard-text="{{url()->full()}}" class="btn border bg-transparent text-primary border-primary btn-outline-primary" style="outline:none !important; box-shadow:none !important;">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#00423c" d="M384 336l-192 0c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l140.1 0L400 115.9 400 320c0 8.8-7.2 16-16 16zM192 384l192 0c35.3 0 64-28.7 64-64l0-204.1c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1L192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-32-48 0 0 32c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l32 0 0-48-32 0z"/></svg>
                                     Copy Link
                                 </a>
@@ -442,14 +474,14 @@
                                         </button>
                                         <div class="custom-dropdown calendar-dropdown">
                                             <!--<input id="detail-page-calendar" type="text" style="display:none;" value="@if($checkInDate && $checkOutDate){{ date('Y-m-d', strtotime($checkInDate)) . ' - ' . date('Y-m-d', strtotime($checkOutDate)) }}@endif" />-->
+                                          
                                             @if($isBookingEnable && $checkInDate && $checkOutDate)
                                                 <input id="detail-page-calendar" type="text" style="display:none;" value="{{ date('Y-m-d', strtotime($checkInDate)) . ' - ' . date('Y-m-d', strtotime($checkOutDate)) }}" />
                                             @else
                                                 <input id="detail-page-calendar" type="text" style="display:none;" />
                                             @endif
 
-                                       
-                                       
+                                            
                                         </div>
                                     </div>
                                     <div class="col-12 field-col position-relative">
@@ -602,7 +634,7 @@
 
                              
                                     <div class="col-12">
-                                        <form action="{{ route('website.customer.property.book') }}" method="POST">
+                                        <form action="{{ route('website.customer.property.book') }}" method="POST" id="subForm">
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $property->id }}">
                                             <!--<input type="hidden" name="checkin_date" value="{{ $checkInDate }}">-->
@@ -617,6 +649,7 @@
                                             <input type="hidden" name="adultsCount" value="{{ $adultsCount }}">
                                             <input type="hidden" name="childrenCount" value="{{ $childrenCount }}">
                                             <input type="hidden" name="guestCount" value="{{ $guestCount }}">
+                                            <input type="hidden" name="extraGuest" id="extraGuest" value="{{ $guestCount }}">
                                             
                                             
                                             @if(session('status'))
@@ -636,7 +669,8 @@
                                             
                                             
                                             @if($property->only_for_enquiry ==0)
-                                               <button type="submit" class="btn py-3 fw-bold w-100 btn-primary booknow" @if(!$isBookingEnable) disabled="disabled" @endif>Book Now</button>
+                                               <button type="@if(!$isBookingEnable) button @else submit  @endif" class="btn py-3 fw-bold w-100 btn-primary booknow @if(!$isBookingEnable)  openCalendar @endif" >Book Now</button>
+                                               <!--<button type="submit" class="btn py-3 fw-bold w-100 btn-primary booknow" @if(!$isBookingEnable) disabled="disabled" @endif>Book Now</button>-->
                                             @else
                                                <button role="button" data-fancybox data-src="#enquire" class="btn py-3 fw-bold w-100 btn-primary">Enquire Now</button>
                                             @endif
@@ -676,7 +710,12 @@
                     <ul class="list-unstyled mb-0 bi-info book-link ">
                         <!--<li class="date-text">{{ date('jS M', strtotime($checkInDate)) ?? '' }} - {{ date('jS M', strtotime($checkOutDate)) ?? '' }}</li>-->
                         
-                        <li class="date-text checkIn_chechout_mobile_display">{{ date('jS M', strtotime($checkInDate)) }} - {{ date('jS M', strtotime($checkOutDate)) }}</li>
+                        <li class="date-text checkIn_chechout_mobile_display">
+                            @if($isBookingEnable && $checkInDate && $checkOutDate)
+                              {{ date('jS M', strtotime($checkInDate)) }} - {{ date('jS M', strtotime($checkOutDate)) }}
+                            @endif
+                            <!--{{ date('jS M', strtotime($checkInDate)) }} - {{ date('jS M', strtotime($checkOutDate)) }}-->
+                        </li>
                         <li>
                             <span class="totalNight">  </span> <span class="">nights</span>                             
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg>
@@ -688,10 +727,9 @@
             <!--    <a href="javascript:void(0)" class="btn w-100 btn-primary px-3 make-reservation">Book Now</a>-->
             <!--</div>-->
             <div class="col-auto">
-                  <form action="{{ route('website.customer.property.book') }}" method="POST">
+                <form action="{{ route('website.customer.property.book') }}" method="POST">
                     @csrf
                     <input type="hidden" name="id" value="{{ $property->id }}">
-                    
                     <input type="hidden" name="slug" value="{{ $property->url_key }}">
                     <input type="hidden" name="location_name" value="{{ $location_name }}">
                     <input type="hidden" name="checkin_date" value="{{ $checkin_date }}">
@@ -701,26 +739,31 @@
                     <input type="hidden" name="adultsCount" value="{{ $adultsCount }}">
                     <input type="hidden" name="childrenCount" value="{{ $childrenCount }}">
                     <input type="hidden" name="guestCount" value="{{ $guestCount }}">
-                    
+                    <input type="hidden" name="extraGuest" id="extraGuestm" value="{{ $guestCount }}">
                     @if(session('status'))
-                    <div id="status-message" class="alert alert-danger">
-                        {{ session('status') }}
-                    </div>
-                    
-                    <script>
-                        setTimeout(function() {
-                            var message = document.getElementById('status-message');
-                            if (message) {
-                                message.style.display = 'none';
-                            }
-                        }, 3000); // 3000ms = 3 seconds
-                    </script>
-                @endif
+                        <div id="status-message" class="alert alert-danger">
+                            {{ session('status') }}
+                        </div>
+                        
+                        <script>
+                            setTimeout(function() {
+                                var message = document.getElementById('status-message');
+                                if (message) {
+                                    message.style.display = 'none';
+                                }
+                            }, 3000); // 3000ms = 3 seconds
+                        </script>
+                    @endif
 
-                    <button type="submit" class="btn w-100 btn-primary px-3 make-reservation booknow" @if(!$isBookingEnable) disabled="disabled" @endif>Book Now</button>
+                    <!--<button id="bookNowBtn" type="submit" class="btn w-100 btn-primary px-3 make-reservation booknow" disabled>Book Now</button>-->
+                    
+                    @if($property->only_for_enquiry ==0)
+                        <button type="@if(!$isBookingEnable) button @else submit  @endif" class="btn w-100 btn-primary px-3 make-reservation booknow @if(!$isBookingEnable)  openCalendarMobile @endif" >Book Now</button>
+                    @else
+                        <button role="button" data-fancybox data-src="#enquire" class="btn w-100 btn-primary px-3">Enquire Now</button>
+                    @endif
                 </form>
             </div>
-            
         </div> 
     </div>
 </div>
@@ -746,8 +789,8 @@
                             <h3>Share this place</h3>
                         </div>
                         <div class="col-auto">
-                            <a href="javascript:void(0)" class="fancy-close" onclick="Fancybox.close()">
-                                <i class="icon-close"></i>
+                            <a href="javascript:void(0)" class="fancy-close" onclick="Fancybox.close()" style="outline:none !important">
+                                <i class="icon-close fs-4"></i>
                             </a>
                         </div>
                     </div>
@@ -783,32 +826,74 @@
                                 <path
                                     d="M64 112c-8.8 0-16 7.2-16 16l0 22.1L220.5 291.7c20.7 17 50.4 17 71.1 0L464 150.1l0-22.1c0-8.8-7.2-16-16-16L64 112zM48 212.2L48 384c0 8.8 7.2 16 16 16l384 0c8.8 0 16-7.2 16-16l0-171.8L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128C0 92.7 28.7 64 64 64l384 0c35.3 0 64 28.7 64 64l0 256c0 35.3-28.7 64-64 64L64 448c-35.3 0-64-28.7-64-64L0 128z" />
                             </svg>Email</a></li>
-                            
-                    <li><a href="javascript:void(0)" data-clipboard-text="hello--sdsdsd-dsd--"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M384 336l-192 0c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l140.1 0L400 115.9 400 320c0 8.8-7.2 16-16 16zM192 384l192 0c35.3 0 64-28.7 64-64l0-204.1c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1L192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-32-48 0 0 32c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l32 0 0-48-32 0z"/></svg>Copy Link</a></li>
+                    
+                    <li >
+                        <a href="javascript:void(0)" data-clipboard-text="{{url()->full()}}" onclick="copyToClipboard(this, '{{ request()->url() }}')" data-bs-toggle="tooltip" 
+                        data-bs-placement="top" 
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M384 336l-192 0c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l140.1 0L400 115.9 400 320c0 8.8-7.2 16-16 16zM192 384l192 0c35.3 0 64-28.7 64-64l0-204.1c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1L192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-32-48 0 0 32c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l32 0 0-48-32 0z"/></svg>
+                            Copy Link
+                        </a>
+                            <span class="copy-msg" style="display:none; color: green; margin-left: 10px;">Copied!</span>
+
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
     
     <script>
-        
+        function copyToClipboard(element, text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show "Copied!" tooltip
+                element.setAttribute('title', 'Copied!');
+                var tooltip = new bootstrap.Tooltip(element);
+                tooltip.show();
+    
+                // Reset tooltip after 1.5 seconds
+                setTimeout(() => {
+                    element.setAttribute('title', 'Copy Link');
+                    tooltip.dispose(); // Properly hide tooltip
+                }, 1500);
+            }).catch(function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    
+        // Initialize all tooltips on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    container: 'body', // Ensures tooltip shows in modals
+                     placement: 'top',
+                    offset: [0, -50]
+                });
+            });
+        });
+    </script>
+
+    <script>
+    
+       
          document.addEventListener('DOMContentLoaded', () => { 
             $(".offer-code .btn").each(function(){
-                    var clipboard = new ClipboardJS(this);
-                    clipboard.on('success', function(e) {
-                        //let el = e.trigger
-        
-                        $(e.trigger).addClass("active");
-        
-                        setTimeout(() => {
-                           // console.log("el", el)
-                            $(e.trigger).removeClass("active");
-                        }, 1000);
-        
-                        e.clearSelection();
-                    });
-        
-                })
+                var clipboard = new ClipboardJS(this);
+                clipboard.on('success', function(e) {
+                    //let el = e.trigger
+    
+                    $(e.trigger).addClass("active");
+    
+                    setTimeout(() => {
+                       // console.log("el", el)
+                        $(e.trigger).removeClass("active");
+                    }, 1000);
+    
+                    e.clearSelection();
+                });
+    
+            })
+          
           
          });
 
@@ -1131,19 +1216,41 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            document.querySelector('.openCalendar').addEventListener('click', function(event) {
+                event.preventDefault(); 
+                let noSpaceStr = $('.js-checkin-text').text().replace(/\s/g, '');
+                if(noSpaceStr !='Check-InAdddates'){
+                    $('#subForm').submit(); 
+                }
+                else{
+                    setTimeout(function() {
+                        $('.btn-checkin').trigger('click');
+                    }, 300);
+                }
+            });
+            
+            
+            document.querySelector('.openCalendarMobile').addEventListener('click', function(event) {
+                event.preventDefault(); 
+                let noSpaceStr = $('.js-checkin-text').text().replace(/\s/g, '');
+                if(noSpaceStr !='Check-InAdddates'){
+                    $('#subForm').submit(); 
+                    
+                }
+                else{
+                    $('.checkIn_chechout_mobile_display').trigger('click');
+                }
+            });
             
             setTimeout(function() {
                 let pricePerNight = 0; 
-    
                 let priceElement = document.querySelector(".PricePerNight");
-        
                 if (priceElement) {
                     let priceText = priceElement.textContent.trim(); 
                     if (priceText) {
                         pricePerNight = parseFloat(priceText.replace(/[^0-9]/g, "")) || 0; 
                     }
                 }
-
                 fbq('track', 'ViewContent', {
                     currency: 'INR', 
                     country: "India",
@@ -1158,8 +1265,6 @@
                     num_infants: 0
                 });
             }, 1000);
-    
-
         });
     </script>
 
@@ -1212,6 +1317,7 @@
                // minNights: 4,
                clearButton: true,
                showTopbar: true,
+               selectForward: true,
                topbarPosition: 'bottom',
                enableCheckout: true,
                disabledDates: disabledDates,
@@ -1325,6 +1431,7 @@ let couponCode = 0;
 let maximum_number_of_guests = "{{ $property->maximum_number_of_guests  }}";
 let adultsCount = parseInt(adults);
 let childrenCount = parseInt(children);
+let noOfBedRooms = "{{$property->no_of_bedrooms}}";
 
     // initializeGuestCounterDetail();
     // $(document).on('click', '[data-type-detail]', function () {
@@ -1450,11 +1557,19 @@ initializeGuestCounterDetail();
 
     if (totalGuest >= maximum_number_of_guests) {
         $('[data-plus-detail][data-type-detail="adults"]').addClass('disabled');
-    } else {
+    }
+    else {
         $('[data-plus-detail][data-type-detail="adults"]').removeClass('disabled');
     }
-
-
+    
+    if(dataTypeDetail == 'children'){
+        if(childrenCount >=noOfBedRooms){
+            $('[data-plus-detail][data-type-detail="children"]').addClass('disabled');
+        }
+        else{
+            $('[data-plus-detail][data-type-detail="children"]').removeClass('disabled');
+        }
+    }
     updateTotalGuestsDetail();
 }
 function updateTotalGuestsDetail() {
@@ -1521,7 +1636,12 @@ function updateTotalGuestsDetail() {
                 if (res.data && res.data.total_extra_guest_charge !== 0) {
                     $('.second-tr').show();
                 }
-                $('.extraGuestCharge').text(res.data.extra_guest_charge)
+                
+                
+                $('#extraGuest').val(res.data.extra_no_of_guest)
+                $('#extraGuestm').val(res.data.extra_no_of_guest)
+               
+                $('.extraGuestCharge').text(res.data.extra_guest_charge*res.data.extra_no_of_guest)
 
                 amountBeforeTax = res.data.amountBeforeTax + res.data.total_additional_charges;
                 tax = initialTax =  res.data.tax;
@@ -1550,6 +1670,13 @@ function updateTotalGuestsDetail() {
                     console.log(couponCode,"couponCode");
                     applyCouponCode(couponCode, 'Apply ');
                 }
+
+                let isBookingEnable = @json($isBookingEnable);
+
+                if (isBookingEnable) {
+                    $("#bookNowBtn").removeAttr("disabled"); // Enable the button if booking is allowed
+                }
+
 
                 let formData = {
                 price_per_night_num_formatted: res.data.price_per_night_num_formatted,
@@ -1643,8 +1770,11 @@ function updateTotalGuestsDetail() {
                                 discountAmount = res.discount;
                             }
                             let amountAfterDiscount = totAmount - discountAmount;
+                            
+                            let ta = amountAfterDiscount/tot_no_of_days
+                            
                             let tax = 12;
-                            if(amountAfterDiscount > 7500){
+                            if(ta > 7500){
                                 tax = 18;
                             }
                             taxAmount = Math.round((amountAfterDiscount*tax)/100);
@@ -2173,34 +2303,6 @@ function toggleButtonState() {
     });
 });
 
-
     </script>
-
-    {{-- <script>
-
-        function BookNow() {
-            var checkinTextElement = document.querySelector('.js-checkin-text');
-            // var checkinbtn = document.querySelector('.btn-checkin');
-
-            // let inputCalendar = document.getElementById('hero-calendar');
-            // window.datepickerHero.open();
-
-            // alert(checkinbtn);
-
-
-            console.log('Current Check-in Text:', checkinTextElement.textContent.trim()); // Debugging
-
-            if (checkinTextElement.textContent.trim() === 'Check-In') {
-                // datepickerHero(); 
-                // if (window.datepickerHero && typeof window.datepickerHero.open === 'function') {
-                //     checkinTextElement.classList.add('active'); // Add active class
-                //     alert('Opening Date Picker'); // Debugging
-                // } else {
-                //     console.error('DatepickerHero is not defined!');
-                // }
-            }
-        }
-        
-    </script> --}}
     
 @endsection

@@ -18,12 +18,12 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group title-editor">
-                                <label for="">Title<span class="text-danger">*</span></label>
+                                <label for="">Title<span class="text-danger"></span></label>
                                 <ckeditor
                                     name="hero_title" 
                                     :toolbar="['italic', 'fontColor']"
                                     v-model:data="slideEdit.heading"
-                                    rules="required"
+                                    
                                 />
                             </div> 
                         </div>
@@ -298,6 +298,9 @@
         axios.get('/api/home-banner').then(res => {
             if(res.data.status){
                 slideEdit.value = res.data.data[0]
+                slideEdit.value.heading = slideEdit.value.heading || '';
+                //slideEdit.value = res.data.data[0] || {};
+              //  console.log(slideEdit.value.heading);
                // onPickedRadio()
                 imagesList.value = res.data.data[0].home_banner_image.map(item => ({
                     id: item.id,
@@ -430,7 +433,7 @@ let imagesListFilter = '';
 
 
         axios.post('/api/home-banner', {
-            title: v.hero_title.replace(/^<[^>]+>|<[^>]+>$/g, ''),
+            title: (v.hero_title || '').replace(/^<[^>]+>|<[^>]+>$/g, ''),
             subtitle: v.hero_subtitle,
             apartment_title: v.apartment_title,
            // file: uploadFile.value.filename,

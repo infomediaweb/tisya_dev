@@ -29,14 +29,12 @@ class MasterHelper{
         return TblHomeType::where('status', 1)->get()->toArray();
     }
 
-    
-    public static function getAmenities(){
+     public static function getAmenities(){
         return TblAmenities::select(
                 'tbl_amenities.*',
                 DB::raw('CONCAT("/storage/amenities/", amenities_image) as amenities_image')
             )->where('status', 1)->get()->toArray(); 
     }
-    
 
     public static function checkedAmenities($amenities_id, $home_id){
        return TblHomeAmenities::where(['home_id'=> $home_id, 'amenities_id' =>$amenities_id])->get();
@@ -67,7 +65,7 @@ class MasterHelper{
             $result_array = json_decode($result_json,TRUE);
             // dd($result_array);
             // dd($result_array);
-            // Self::saveRuLog($xml, $result_array);
+            Self::saveRuLog($xml, $result_array);
             $data = array('success'=>true, 'message'=>'Listed successfully', 'code'=>200, 'data'=>$result_array);
         }
         catch(Exception $e){
@@ -84,25 +82,23 @@ class MasterHelper{
     }
 
     public static function saveRuLog($api_request, $response){
-        // $api_status = false;
-        // $xml_req_log = str_replace(config('ru.RU_PASSWORD'), 'xxxxxxxxxxxxxx', str_replace(config('ru.RU_USER_NAME'), 'xxxxxxxxxxxxxx', $api_request));
-        // $log = array();
-        // if($response['Status'] == 'Success'){
-        //     $api_status = true;
-        // }
-        // $log['api_request'] = $xml_req_log;
-        // $log['response_id'] = $response['ResponseID'];
-        // $log['message'] = $response['Status'];
-        // $log['api_status'] = $api_status;
-        // $log['log'] = json_encode($response, true);
-        // $log['add_ip'] = request()->ip();
-        // try{
-        //     return RuLog::create($log);
-        // }
-        // catch(Exception $e){
-        //   return $e->getMessage();
-        // }
+        $api_status = false;
+        $xml_req_log = str_replace(config('ru.RU_PASSWORD'), 'xxxxxxxxxxxxxx', str_replace(config('ru.RU_USER_NAME'), 'xxxxxxxxxxxxxx', $api_request));
+        $log = array();
+        if(isset($response['Status']) && $response['Status'] == 'Success'){
+            $api_status = true;
+        }
+        $log['api_request'] = $xml_req_log;
+        $log['response_id'] = isset($response['Status'])?$response['ResponseID']:'server'.time();
+        $log['message'] = isset($response['Status'])?$response['Status']:'Error';
+        $log['api_status'] = $api_status;
+        $log['log'] = json_encode($response, true);
+        $log['add_ip'] = request()->ip();
+        try{
+            return RuLog::create($log);
+        }
+        catch(Exception $e){
+           return $e->getMessage();
+        }
     }
-
-
 }

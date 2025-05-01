@@ -12,9 +12,10 @@ class HomeAdditionalCharge extends Model{
     protected $fillable = [
         'name',
         'price',
-        'type_option',
         'home_id',
         'gst',
-        'status'
+        'status',
+        'display_on_website',
+        'type_option'
     ];
 }

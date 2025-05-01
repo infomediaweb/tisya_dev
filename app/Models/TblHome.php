@@ -65,13 +65,20 @@ class TblHome extends Model
         return $this->hasMany(TblHomeAmenities::class, 'home_id');
     }
 
+    // public function homeReviews(){
+    //     return $this->hasMany(TblHomeReview::class, 'home_id')->orderBy('id', 'desc');
+    // }
+    
     public function homeReviews(){
         return $this->hasMany(TblHomeReview::class, 'home_id')->with('reviewImages')->orderBy('id', 'desc');
     }
 
+
     public function propertyAvailabilities(){
         return $this->hasMany(RuPropertyAvailability::class, 'ru_property_id', 'ru_property_id');
     }
+
+
 
 
     public function amenities(){

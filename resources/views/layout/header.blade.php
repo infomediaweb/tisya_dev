@@ -73,7 +73,7 @@
                                             <ul class="dropdown-menu" data-popper-placement="bottom-end">
                                                 
                                             @foreach($states_with_locations as $state)
-                                            <li class="li-heading"><a href="{{ route('property-list', ['location_name' => $state->name, 'location' => $state->name, 'filter_type' => 'state', 'type' => 'listPropertiesSearch']) }}">{{ $state->name }} (All Properties)</a></li>
+                                            <li class="li-heading"><a href="{{ route('property-list', ['location_name' => $state->name, 'filter_type' => 'state', 'type' => 'listPropertiesSearch']) }}">{{ $state->name }} (All Properties)</a></li>
                                             @foreach($state->locations as $location)
                                                 <li><a class="dropdown-item" href="{{ route('property-list', ['location_name' => $location->location_name, 'location' => $location->location_name, 'filter_type' => 'location', 'type' => 'listPropertiesSearch']) }}">{{ $location->location_name }}</a></li>
                                             @endforeach
@@ -110,7 +110,7 @@
                                             <div class="dropdown-mobile-wrapper">
                                                 <ul class="dropdown-menu dropdown-menu-end dropdown-shadow">
                                                     <li class="d-xl-none">                                                      
-                                                      <a class="dropdown-item" href="{{route('properties')}}">All Properties</a>
+                                                      <a class="dropdown-item" href="{{ route('property-list', ['type' => 'listAllProperty']) }}">All Properties</a>
                                                     </li>
 
                                                     <li class="d-xl-none">                                                      

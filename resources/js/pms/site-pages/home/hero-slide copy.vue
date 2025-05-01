@@ -20,17 +20,17 @@
                             <div class="form-group title-editor">
                                 <label for="">Title<span class="text-danger">*</span></label>
                                 <ckeditor
-                                    name="hero_title"
+                                    name="hero_title" 
                                     :toolbar="['italic', 'fontColor']"
                                     v-model:data="slideEdit.heading"
                                     rules="required"
                                 />
-                            </div>
+                            </div> 
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Subtitle<span class="text-danger">*</span></label>
-                                <Field
+                                <Field 
                                     type="text"
                                     name="hero_subtitle"
                                     class="form-control"
@@ -38,12 +38,60 @@
                                     v-model="slideEdit.subtitle"
                                     rules="required"
                                 />
-                            </div>
+                            </div> 
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label>Images<span class="text-danger">*</span></label>
-                                <div class="upload-wrapper" :class="{'border-danger': errors.multipleImages}">
+                                <label for="">Apartment Title<span class="text-danger">*</span></label>
+                                <Field 
+                                    type="text"
+                                    name="apartment_title"
+                                    class="form-control"
+                                    :class="{'border-danger': errors.apartment_title}"
+                                    v-model="slideEdit.apartment_title"
+                                    rules="required"
+                                />
+                            </div> 
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <div class="row gx-4">
+                                            <div class="col-auto" v-for="(obj, index) in radioInputType">
+                                                <div class="form-check custom-check">
+                                                    <input 
+                                                        type="radio" 
+                                                        name="image-video" 
+                                                        class="form-check-input"
+                                                        :id="obj.value"
+                                                        :value="obj.value"
+                                                        v-model="pickedRadioValue" 
+                                                        @change="onPickedRadio($event, obj.value)"
+                                                    />
+                                                    <label :for="obj.value">{{ obj.name }}<span class="text-danger">*</span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <template v-if="pickedRadioValue == 'image'">
+                                            <!-- <UploadFile 
+                                                v-if="renderComponent"
+                                                name="image"
+                                                id="image"
+                                                fileType="image"
+                                                acceptType="image/*"
+                                                info="Max size: 3mb | Image size: 1280px . 720px"
+                                                changeText="To change the image please click / drag new image here!"
+                                                size="3"
+                                                ratio="40%"
+                                                v-bind="uploadFileProps"
+                                                :rules="uploadFileProps.fileName ? 'image|ext:jpg,jpeg,webp,svg,png|size:3144' : 'required|image|ext:jpg,jpeg,webp,svg,png|size:3144'"
+                                                @emitUploadFile="getUploadFile"
+                                               :isDeleteDisabled="true"
+                                            /> -->
+
+                                            <div class="upload-wrapper" :class="{'border-danger': errors.multipleImages}">
                                     <Field
                                         type="file"
                                         name="multipleImages"
@@ -51,7 +99,7 @@
                                         accept="image/*"
                                         multiple
                                         @change="multipleImages($event, errors.multipleImages)"
-                                        :rules="imagesList.length ? 'image|size:2048|ext:jpg,jpeg,webp,svg,png' : 'required|image|size:2048|ext:jpg,jpeg,webp,svg,png'"
+                                        :rules="imagesList.length ? 'image|size:3144|ext:jpg,jpeg,webp,svg,png' : 'required|image|size:3144|ext:jpg,jpeg,webp,svg,png'"
                                     />
 
                                     <div class="upload-info">
@@ -65,11 +113,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <template v-if="imagesList.length">
-                            <div class="col-12" >
+                                    <template v-if="imagesList.length">
+                            <div class="col-12 pt-4" >
                                 <div class="image-wrapper form-group">
                                     <VueDraggableNext
                                         class="row gy-4"
@@ -79,7 +124,7 @@
                                         @change="onDragChange"
                                         filter="button, .img-status">
                                         <div
-                                            class="col-6 col-sm-4 col-md-3 col-lg-2 drag-el"
+                                            class="col-6 col-sm-4 col-md-3  drag-el"
                                             v-for="(obj, index) in imagesList"
                                             :key="index"
                                             :class="{'active': activeDrag == index}">
@@ -87,21 +132,6 @@
                                                 <div class="col-12">
                                                     <div class="upload-img">
                                                         <img :src="obj.filepath" class="w-100">
-                                                        <div class="img-status">
-                                                            <input
-                                                                type="checkbox"
-                                                                :id="`status-${obj}`"
-                                                                name="status"
-                                                                class="form-check-input rounded-pill"
-                                                                :checked="obj.status == 1"
-                                                                v-model="obj.status"
-                                                                @change="updateStatus($event, obj.id)"
-                                                                true-value="1"
-                                                                false-value="0"
-                                                            >
-                                                            <label>{{ obj.status == true ? 'Active' : 'Inactive' }}</label>
-                                                        </div>
-
                                                         <button type="button" @click="deleteItem(index, obj.id, resetForm, values)" class="btn btn-light btn-sm">
                                                             <i class="bi bi-trash"></i>
                                                         </button>
@@ -113,7 +143,28 @@
                                 </div>
                             </div>
                         </template>
+                                        </template>
 
+                                        <template v-else>
+                                            <UploadFile 
+                                                v-if="renderComponent"
+                                                name="video"
+                                                id="video"
+                                                fileType="video"
+                                                acceptType="video/mp4"
+                                                info="Max size: 100mb"
+                                                changeText="To change the video please click / drag new video here!"
+                                                size="100"
+                                                ratio="40%"
+                                                :rules="uploadFileProps.fileName ? 'size:104800|ext:mp4' : 'required|size:104800|ext:mp4'"
+                                                v-bind="uploadFileProps"
+                                                @emitUploadFile="getUploadFile"
+                                                :isDeleteDisabled="true"
+                                            />
+                                        </template>
+                                    </div> 
+
+                                </div>
                     </div>
 
                     <div class="row pt-2">
@@ -134,25 +185,87 @@
 <script setup>
     import ckeditor from '@components/ckeditor.vue'
     import axios from 'axios'
-    import { ref, onMounted } from 'vue'
+    import { ref, reactive, onMounted ,defineAsyncComponent, nextTick } from 'vue'
     import { Form, Field, ErrorMessage } from 'vee-validate'
     import { validateFile } from '@utils/validate-file'
     import { VueDraggableNext } from 'vue-draggable-next'
     import { toast } from '@utils/toast'
     import { dialog } from '@utils/modal'
-
+    import {  useRoute } from 'vue-router'
+    const submitApiUrl = ref(null)
+    const route = useRoute()
+    const UploadFile = defineAsyncComponent(() => import('@components/upload-file.vue'))
+    const uploadFile = ref({})
     const imagesList = ref([])
     const slideEdit = ref({})
     const activeDrag = ref(null)
     const isLoading = ref(false)
     const isSubmitLoading = ref(false)
+    const pickedRadioValue = ref('image')
+    const renderComponent = ref(true)
+    const radioInputType = ref([
+        { 
+            value: 'image' ,
+            name: 'Image'
+        },
+        { 
+            value: 'video',
+            name: 'Video' 
+        }
+    ])
+    const uploadFileProps = reactive({
+        filePath: '',
+        fileName: '', 
+    })
+    const getUploadFile = (value) => {
+        uploadFile.value = value
+    }
 
+    const onPickedRadio = (e, value = pickedRadioValue.value) => {
+        
+        let props = uploadFileProps
+        let fileData = slideEdit.value
 
-    // For upload multiple image
+        console.log(fileData.home_banner_video.filepath,"sss");
+
+        const propsInitValue = async (type) => {
+            renderComponent.value = false
+            await nextTick()
+            renderComponent.value = true
+            if(fileData.file_type == type){
+                props.filePath = fileData.home_banner_video.filepath
+                props.fileName = fileData.home_banner_video.filepath
+            }
+            else{
+                props.filePath = fileData.home_banner_video.filepath
+                props.fileName = fileData.home_banner_video.filepath
+            } 
+        }
+
+        if(value == 'video'){
+            propsInitValue(value)
+        }
+        /* else if(value == 'image'){
+            propsInitValue(value)
+        } */
+    }
+
+    const deleteUploadFile = (id) => {
+        axios.get(`/api/testimonials-delete-image/${id}`).then(res => {
+            if(res.data.status){
+                toast(res.data.message, 'success').show()
+                uploadFileProps.filePath = ''
+                uploadFileProps.fileName = '' 
+            }
+        }).catch(error => {
+            toast(error.response.data.message, 'error').show()
+        })
+    }
+    // For upload multiple image 
     const multipleImages = async (e, errorMessage) => {
         const files = e.target.files
         const formData = new FormData()
-
+        
         for(let i = 0; i < files.length; i++){
             if(validateFile(files[i], errorMessage) == false){
                 continue
@@ -172,7 +285,7 @@
             }
 
             await formData.delete('file')
-        }
+        } 
 
         e.target.value = null
     }
@@ -181,25 +294,26 @@
     // For get slides data
     const getSlidesEdit = () => {
         isLoading.value = true
-
+        
         axios.get('/api/home-banner').then(res => {
             if(res.data.status){
                 slideEdit.value = res.data.data[0]
-
-                imagesList.value = res.data.data.map(item => ({
+               // onPickedRadio()
+                imagesList.value = res.data.data[0].home_banner_image.map(item => ({
                     id: item.id,
-                    filename: item.image,
-                    filepath: item.image_path,
+                    filename: item.file,
+                    filepath: item.filepath,
                     status: item.status
                 }))
-
+                
+               
                 setTimeout(() => {
                     isLoading.value = false
                 }, 400)
             }
         }).catch(error => {
-            if(error.response.data.message){
-                toast(error.response.data.message, 'error').show()
+            if(error.data){
+                toast(error.response.data.message, 'error').show()  
             }
             isLoading.value = false
         })
@@ -234,7 +348,7 @@
     }
 
 
-    // For change current image status
+    // For change current image status 
     const updateStatus = ({ target }, id) => {
         if(id){
             axios.post(`/api/home-banner-update-status/${id}`, {
@@ -250,7 +364,7 @@
     }
 
 
-    // For delete current image
+    // For delete current image 
     const deleteItem = (idx, id, resetForm, values) => {
         if(id){
             dialog('Are you sure you want to remove?', confirm).show()
@@ -268,7 +382,7 @@
         }
         else{
             imagesList.value.splice(idx, 1)
-
+            
             const multipleImages = values?.multipleImages?.filter((item, index) => index !== idx)
 
             resetForm({
@@ -284,16 +398,44 @@
     const onSubmit = (v) => {
         isSubmitLoading.value = true
 
-        let imagesListFilter = imagesList.value.map(item => ({
+       /*  let imagesListFilter = imagesList.value.map(item => ({ 
             filename: item.filename,
-            filepath: item.filepath,
+            filepath: item.filepath, 
             status: item.status
-        }))
+        })) */
+
+       /*  if(route.params.id){
+            submitApiUrl.value = `/api/home-banner/${route.params.id}`
+        }
+        else{
+            submitApiUrl.value = '/api/home-banner'
+        } */
+let imagesListFilter = '';
+        if(pickedRadioValue.value == 'image'){
+             imagesListFilter = imagesList.value.map(item => ({
+                filename: item.filename,
+                file_type: pickedRadioValue.value,
+                status: item.status
+            }))
+        }
+        else{
+             imagesListFilter = [{
+                filename: uploadFile.value.filename,
+                file_type: pickedRadioValue.value,
+                status: 1,
+            }]
+            
+        }
+
+
 
         axios.post('/api/home-banner', {
             title: v.hero_title.replace(/^<[^>]+>|<[^>]+>$/g, ''),
             subtitle: v.hero_subtitle,
-            images: imagesListFilter,
+            apartment_title: v.apartment_title,
+           // file: uploadFile.value.filename,
+          //  file_type: pickedRadioValue.value,
+              images: imagesListFilter,
         }).then(res => {
             if(res.data.status){
                 toast(res.data.message, 'success').show()
@@ -312,6 +454,7 @@
 
     onMounted(() => {
         getSlidesEdit()
+        
     })
 
 </script>

@@ -13,7 +13,12 @@ class Kernel extends ConsoleKernel{
     protected function schedule(Schedule $schedule): void{
         $schedule->command('urpp:job')->dailyAt('00:00');
         $schedule->command('app:test')->dailyAt('00:00');
-        $schedule->command('job:getRuBookings')->dailyAt('00:00');
+        $schedule->command('job:getRuBookings');
+        $schedule->command('urpp:job')->dailyAt('00:00');
+        $schedule->command('SyncMinStayCommandJob');
+        $schedule->command('propertyAvailabilityJob');
+        $schedule->command('UpdateExtrnalBookings');
+        $schedule->command('UpdatePropertyPriceBeforeTodayJob');
     }
 
     /**

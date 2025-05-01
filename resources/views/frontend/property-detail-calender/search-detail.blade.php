@@ -24,7 +24,7 @@
                     <small>Guests</small>
                     <div class="search-field-value">Add guests</div>
                 </button>   
-                <div class="custom-dropdown guests-counter guests-dropdown pStatic">
+                <div class="custom-dropdown guests-counter guests-dropdown">
                     <ul class="list-unstyled m-0">
                         <li>
                             <div class="row flex-nowrap align-items-center">

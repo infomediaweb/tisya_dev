@@ -260,6 +260,40 @@ public function savePosition(Request $request)
 
 
 
+// public function deleteImage($id) {
+//     //$bannerdata = TblHomeBanner::find($id);
+//     $banner = TblHomeBannerImage::find($id);
+//     if(!$banner) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Banner not found.'
+//         ], 404);
+//     }
+
+//     $banner_image_path = "public/home_banner/" . $banner->file;
+
+//     if(!empty($banner->file) && Storage::exists($banner_image_path)) {
+//         if(Storage::delete($banner_image_path)) {
+//             $banner->delete(); 
+//             return response()->json([
+//                 'status' => true,
+//                 'message' => 'Successfully Deleted.'
+//             ], 200);
+//         } else {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'Failed to delete the image.'
+//             ], 500);
+//         }
+//     } else {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Image not found.'
+//         ], 404);
+//     }
+// }
+
+
 public function deleteImage($id) {
     //$bannerdata = TblHomeBanner::find($id);
     $banner = TblHomeBannerImage::find($id);
@@ -292,7 +326,6 @@ public function deleteImage($id) {
         ], 404);
     }
 }
-
 public function updateStatus(Request $request, $id)
 {
     

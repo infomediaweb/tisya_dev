@@ -310,12 +310,11 @@
 	                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
 	                                <tr>
 	                                    <td dir="ltr" valign="top" style="padding: 0 20px 20px 0;text-align: left;">
-	                                        <img class="g-img" src="{{ $prorperty->image_full_path ?? '' }}" width="230" height="" alt="Casa Y’na – A Perfect Luxury Retreat" border="0" style="width: 100%; max-width: 230px; background: #dddddd; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; color: #000000;">
-                                            <!--@if($prorpertyAssetsDetail)-->
-	                                           <!--<img class="g-img" src="{{ asset($prorpertyAssetsDetail->filename) }}" width="230" height="" alt="Casa Y’na – A Perfect Luxury Retreat" border="0" style="width: 100%; max-width: 230px; background: #dddddd; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; color: #000000;">-->
-                                            <!--@else-->
-                                            <!--   <img class="g-img" src="{{ asset('assets/images/noimage-property.jpg') }}" width="230" height="" alt="Casa Y’na – A Perfect Luxury Retreat" border="0" style="width: 100%; max-width: 230px; background: #dddddd; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; color: #000000;">-->
-                                            <!--@endif-->
+                                            @if($prorpertyAssetsDetail)
+	                                           <img class="g-img" src="{{ asset($prorpertyAssetsDetail->filename) }}" width="230" height="" alt="Casa Y’na – A Perfect Luxury Retreat" border="0" style="width: 100%; max-width: 230px; background: #dddddd; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; color: #000000;">
+                                            @else
+                                               <img class="g-img" src="{{ asset('assets/images/noimage-property.jpg') }}" width="230" height="" alt="Casa Y’na – A Perfect Luxury Retreat" border="0" style="width: 100%; max-width: 230px; background: #dddddd; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; color: #000000;">
+                                            @endif
 	                                    </td>
 	                                </tr>
 	                            </table>
@@ -389,7 +388,7 @@
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tbody><tr>
                             <td style="padding: 30px; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px; color: #000000;">
-                                <p style="margin: 0 0 20px;">For any further assistance or to make changes to your booking, please contact us at <strong>reservations@tisyastays.com</strong> or <strong>+91 84529 92240</strong>.</p>
+                                <p style="margin: 0 0 20px;">For any further assistance or to make changes to your booking, please contact us at <strong>reservations@tisyastays.com</strong> or <strong>+91 8799915100</strong>.</p>
                                 <p style="margin: 0;">We look forward to welcoming you to Tisya Stays and hope you have a pleasant stay.</p>
                             </td>
                         </tr>
@@ -415,12 +414,12 @@
                                         <td style="font-family: Arial, sans-serif; font-size: 14px; line-height: 20px; color: #000000;vertical-align: middle;">Follow us</td>
                                         <td style="vertical-align: middle;padding-left: 5px;">
                                             <a href="https://facebook.com" target="_blank">
-                                                <img src="https://adserve.iws.in/trisya-mail/facebook.png" alt="Facebook" width="24" height="24" border="0" style="height: auto; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; display: block; color: #000000;">
+                                                <img src="{{ asset('assets/images/facebook.png') }}" alt="Facebook" width="24" height="24" border="0" style="height: auto; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; display: block; color: #000000;">
                                             </a>
                                         </td>
                                         <td style="vertical-align: middle;padding-left: 5px;">
                                             <a href="https://instagram.com" target="_blank">
-                                                <img src="https://adserve.iws.in/trisya-mail/instagram.png" alt="Instagram" width="24" height="24" border="0" style="height: auto; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; display: block; color: #000000;">
+                                                <img src="{{ asset('assets/images/instagram.png') }}" alt="Instagram" width="24" height="24" border="0" style="height: auto; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; display: block; color: #000000;">
                                             </a>
                                         </td>
                                     </tr>

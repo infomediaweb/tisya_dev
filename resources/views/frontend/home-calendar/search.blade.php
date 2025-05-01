@@ -18,7 +18,7 @@
                         
                        @foreach($states_with_locations as $state)
                                 <li class="li-heading">
-                                    <a class="location-item" href="#" data-locid="{{ $state->name ?? '' }}" data-locationid="state" data-locationname="{{ $state->name ?? '' }}">
+                                    <a class="location-item" href="#" data-locid="" data-locationid="state" data-locationname="{{ $state->name ?? '' }}">
                                         {{ $state->name ?? '' }} (All Properties)
                                     </a>
                                 </li>
@@ -240,9 +240,12 @@
             } else {
                 inputValue > 0 ? minusEl.removeClass('disabled') : minusEl.addClass('disabled');
             }
-            // if (dataType === 'children') {
-            //     inputValue >= 2 ? plusEl.addClass('disabled') : plusEl.removeClass('disabled');
-            // }
+            if(dataType === 'children' && inputValue >= 4){
+                $('[data-type="children"][data-plus]').addClass('disabled');
+            }
+            else{
+                $('[data-type="children"][data-plus]').removeClass('disabled');
+            }
             updateTotalGuests();
         }
         function updateTotalGuests() {
@@ -272,13 +275,13 @@
           //  const totalGuest = Number(adultsCount) + Number(childrenCount);
             const totalGuest = Number(adultsCount); 
 
-            if(location_id ==''){
+            if(locationID ==''){
                 alert('Please Select Destination');
                 return false;
             }else{
                 const data = {
                     location_name: location_name,
-                    location: location_id,
+                    //location: location_id,
                     filter_type: locationID,
                     type: 'listPropertiesSearch',
                     checkin_date: checkin_date,
@@ -287,6 +290,11 @@
                     childrenCount: childrenCount,
                     total_guests: totalGuest,
                 };
+                
+                if (location_id !== '') {
+                    data.location = location_id;  
+                }
+                
                 dynamicAjaxRequest(data);
             }  
         });

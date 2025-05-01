@@ -1,0 +1,1 @@
+<div wire:loading.remove>

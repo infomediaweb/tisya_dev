@@ -270,7 +270,7 @@
                 <td align="center" style="padding: 20px 30px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #cccccc;">
                     <a href="{{ route('index') }}">
                         <img 
-                            src="https://tisya.tempsite.in/assets/images/logo.png" 
+                            src="{{ asset('assets/images/logo.png') }}" 
                             alt="Logo" 
                             width="180" 
                             height="46" 
@@ -286,12 +286,12 @@
                      <p>
                         We have received a booking enquiry with the following details:
                     </p>
-                     <p><strong>Property Name:</strong> {{ $data['property_name'] }}</p>
+                    <p><strong>Property Name:</strong> {{ $data['property_name'] }}</p>
                      <p><strong>Name:</strong> {{ $data['name'] }}</p>
                      <p><strong>Email Address:</strong> {{ $data['email'] }}</p>
                      <p><strong>Phone Number:</strong> {{ $data['country_code'] }} - {{ $data['phone'] }}</p> 
                      <p><strong>Check In:</strong> {{ \Carbon\Carbon::parse($data['ci_date'])->format('j F Y') }}</p>
-                     <p><strong>Check Out:</strong> {{ \Carbon\Carbon::parse($data['co_date'])->format('j F Y') }}</p>
+                     <p><strong>Check Out:</strong> {{ \Carbon\Carbon::parse($data['co_date'])->format('j F Y') }}</p> 
                      <p><strong>Message:</strong> {{ $data['message'] }}</p> 
                  </td>                
              </tr>
@@ -328,12 +328,12 @@
                                         <td style="font-family: Arial, sans-serif; font-size: 14px; line-height: 20px; color: #000000;vertical-align: middle;">Follow us</td>
                                         <td style="vertical-align: middle;padding-left: 5px;">
                                             <a href="https://www.facebook.com/tisyastaysHQ/" target="_blank">
-                                                <img src="https://adserve.iws.in/trisya-mail/facebook.png" alt="Facebook" width="24" height="24" border="0" style="height: auto; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; display: block; color: #000000;">
+                                                <img src="{{ asset('assets/images/facebook.png') }}" alt="Facebook" width="24" height="24" border="0" style="height: auto; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; display: block; color: #000000;">
                                             </a>
                                         </td>
                                         <td style="vertical-align: middle;padding-left: 5px;">
                                             <a href="https://www.instagram.com/tisyastays/?utm_medium=copy_link" target="_blank">
-                                                <img src="https://adserve.iws.in/trisya-mail/instagram.png" alt="Instagram" width="24" height="24" border="0" style="height: auto; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; display: block; color: #000000;">
+                                                <img src="{{ asset('assets/images/instagram.png') }}" alt="Instagram" width="24" height="24" border="0" style="height: auto; font-family: Arial, sans-serif; font-size: 14px; line-height: 15px; display: block; color: #000000;">
                                             </a>
                                         </td>
                                     </tr>
@@ -344,6 +344,7 @@
                    </table>
                 </td>
             </tr>
+             
         
          </table>
          <!-- Email Body : END -->

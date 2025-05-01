@@ -16,6 +16,20 @@ class RazorpayController extends Controller{
     
     public function handleWebhookCallBack(Request $request) {
         try {
+            if(!$request->all()){
+                return response()->json([
+                    'status' => true,
+                    'message' => "Invalid Request",
+                ], 200);
+            }
+            
+            if($request->missing('razorpay_invoice_id')){
+                return response()->json([
+                    'status' => true,
+                    'message' => "Invalid Request",
+                ], 200);
+            }
+            
             $payload = array(
                 'razorpay_invoice_id'=>$request->query('razorpay_invoice_id'),
                 'razorpay_invoice_receipt'=>$request->query('razorpay_invoice_receipt'),
@@ -36,6 +50,7 @@ class RazorpayController extends Controller{
     public function paymentThankyou($id) {
         
         $paymentRequestInfo = PropertyBookingPaymentRequest::find(['id'=>$id])->first();
+        
         $data = PropertyBooking::withTrashed()->with('home')->where('id', $paymentRequestInfo->property_booking_id)->first();
         $prorpertyAssetsDetail = TblHomeImageVideo::where('home_id', $data->home->id)->where('type', 'image')->first();
         return view('emails.thankyou', compact('paymentRequestInfo', 'data', 'prorpertyAssetsDetail'));

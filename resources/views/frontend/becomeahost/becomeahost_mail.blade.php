@@ -270,7 +270,7 @@
                 <td align="center" style="padding: 20px 30px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #cccccc;">
                     <a href="{{ route('index') }}">
                         <img 
-                            src="https://tisya.tempsite.in/assets/images/logo.png" 
+                            src="{{asset('assets/images/logo.png')}}" 
                             alt="Logo" 
                             width="180" 
                             height="46" 
@@ -305,7 +305,7 @@
              <tr bgcolor="#f0f0f0">
                  <td  align="center" style="padding-top: 15px;padding-bottom: 15px;"> <a href="{{ route('index') }}">
                         <img 
-                            src="https://tisya.tempsite.in/assets/images/logo.png" 
+                            src="{{asset('assets/images/logo.png')}}" 
                             alt="Logo" 
                             width="180" 
                             height="46" 

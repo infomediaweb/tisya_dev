@@ -27,15 +27,13 @@ use URL;
 
 
 class RazorpayService{
-
-   
-    public function __construct()
+ public function __construct()
     {
         $this->api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
     }
 
    
-   public function createOrder($amount, $currency = 'INR', $receipt = 'order_rcptid_11')
+public function createOrder($amount, $currency = 'INR', $receipt = 'order_rcptid_11')
     {
         try {
             $order = $this->api->order->create([
@@ -51,6 +49,7 @@ class RazorpayService{
             return null;
         }
     }
+  
   
 
     public static function createPaymentLink($payload){
@@ -83,7 +82,7 @@ class RazorpayService{
 
                 'description' => 'Payment Request for '.$propertyBooking->home->home_name.' || booking id ['.$paymentRequestInfo->amount.']',
 
-                'callback_url' => 'https://tisyastays.rentals.management/razorpay/webhook/callback',
+                'callback_url' => 'https://www.tisyastays.com/razorpay/webhook/callback',
 
                 'notify' => [
 
@@ -144,6 +143,8 @@ class RazorpayService{
     public static function handleWebhookCallBack($payload){
 
         // Construct the payload manually
+        
+       
 
         $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
 
@@ -179,6 +180,7 @@ class RazorpayService{
 
             }
             $paymentRequestDetail->save();
+          
             if($payload['razorpay_invoice_status']=='paid'){
                 $bookingDetail = PropertyBooking::find(['id'=>$paymentRequestDetail->property_booking_id])->first();
                 $paid_amount = $bookingDetail->paid_amount + $paymentRequestDetail->amount;
@@ -186,8 +188,8 @@ class RazorpayService{
                 $totPaid = PropertyBookingPaymentRequest::where(['property_booking_id'=>$bookingDetail->id])->sum('amount');
                 if($totPaid >=$bookingDetail->payable_amount){
                     $bookingDetail->booking_status = 'paid';
-                    $bookingDetail->property_booking_status = 'Confirmed';
                 }
+                $bookingDetail->property_booking_status = 'Confirmed';
                 $bookingDetail->save();
             }
             return array('id'=>$paymentRequestDetail->id);
@@ -195,8 +197,7 @@ class RazorpayService{
 
         catch (\Exception $e) {
 
-            dd($e->getMessage());
-
+            
             Storage::disk('local')->put('razorpay_callback_error_'.time().'.txt', $e->getMessage());
 
             Log::error('Webhook signature verification failed', ['error' => $e->getMessage()]);

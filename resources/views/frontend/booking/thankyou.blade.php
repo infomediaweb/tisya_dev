@@ -98,7 +98,7 @@
                     <div class="col-6 col-md-auto">
                         <div class="bd-box">
                             <small>Payment Method:</small>
-                            <strong>Payu</strong>
+                            <strong>Razorpay</strong>
                         </div>
                     </div>
                     <div class="col-6 col-md-auto">
@@ -119,7 +119,7 @@
     </div>
 </section>
 
-@if($prorpertyAssetsDetail)
+
 <script>
     fbq('track', 'Purchase', {
         currency: 'INR',
@@ -140,6 +140,6 @@
     });
 </script>
 
-@endif
+
 
 @endsection

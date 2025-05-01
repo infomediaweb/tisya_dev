@@ -12,15 +12,12 @@ class TblSpecialInvitation extends Model
     protected $table = 'tbl_special_invitations';
     protected $guarded = [];
     
-    public function couponCode()
-    {
+    public function couponCode(){
         return $this->hasOne(DiscountCoupon::class, 'id', 'couponcode_id');
     }
     
     
-    public function discountCoupon()
-{
-    return $this->belongsTo(DiscountCoupon::class, 'couponcode_id', 'id'); 
-}
-
+    public function discountCoupon(){
+        return $this->belongsTo(DiscountCoupon::class, 'couponcode_id', 'id'); 
+    }
 }

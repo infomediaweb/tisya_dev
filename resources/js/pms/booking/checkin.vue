@@ -40,6 +40,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <div class="row gx-5">
+                                    <div class="col-auto">
+                                        <span class="fw-bold">Note :</span> {{ NoteDes }}
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
                         <!--  <pre>{{ guests }}</pre> -->
                         <div class="col-12">
                             <div class="row nth-row g-4">
@@ -99,7 +109,7 @@
                                                             :class="{'border-danger': errors[`mobile_no-${index}`]}"
                                                             v-model="obj.mobile_no"
                                                             @input="onInputChange($event, index, 'number')"
-                                                            :rules="!index ? 'required|numeric|max:16|min:8' : 'numeric|max:16|min:8'"
+                                                            :rules="!index ? 'required|numeric|max:16|min:6' : 'numeric|max:16|min:6'"
                                                             data-bs-toggle="tooltip"
                                                         />
                                                         <Tooltip
@@ -141,7 +151,7 @@
                                                                     multiple
                                                                     @change="uploadMultipleFiles($event, errors[`multipleFiles${index}`], index)"
                                                                     accept="image/*,application/pdf"
-                                                                    :rules="obj.multipleFiles.length ? 'size:3072|ext:jpg,jpeg,png,pdf' : !index ? 'required|size:3072|ext:jpg,jpeg,png,pdf' : ''"
+                                                                    :rules="(obj?.multipleFiles?.length ?? 0) ? 'size:3072|ext:jpg,jpeg,png,pdf' : (!index ? 'required|size:3072|ext:jpg,jpeg,png,pdf' : '')"
                                                                 />
 
                                                                 <div class="upload-info">
@@ -167,7 +177,7 @@
                                                                     <div class="imgWrapper multifile-upload">
                                                                         <a :href="objImage.filepath" class="imgBoxNew" target="_blank">
                                                                             <template v-if="objImage.extension == 'pdf'">
-                                                                                <div class="icon-wrap ">
+                                                                                <div class="icon-wrap">
                                                                                     <i class="bi bi-file-earmark-pdf"></i>
                                                                                 </div>
                                                                             </template>
@@ -212,12 +222,10 @@
     </div>
 </template>
 <style>
-.imgBoxNew{display: block; background-color: #ffffff; position: relative; padding-bottom: 100%; text-decoration: none; border-radius: 10px; overflow: hidden;}
+.imgBoxNew{display: block; position: relative; padding-bottom: 100%; text-decoration: none; border-radius: 10px; overflow: hidden;}
 .imgBoxNew img{position: absolute; object-fit: cover; width: 100%; height: 100%;}
 .imgWrapper{position: relative;}
 .imgWrapper button{position: absolute; top:10px; right: 10px;}
-.imgBoxNew .icon-wrap{position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; align-items: center; justify-content: center;}
-.imgBoxNew .icon-wrap i{font-size: 48px;}
 
 
 
@@ -244,6 +252,7 @@
     const isLoading = ref(false)
     const isSubmitLoading = ref(false)
     const bookingID = ref('')
+    const NoteDes = ref('')
 
 
     // For initial value of guest
@@ -333,6 +342,7 @@
                     let guestIncludedNo = parseInt(res.data.data.no_of_adult)
                     guestIncludedNo = guestIncludedNo
                     let guestDetail = res.data.data.customer_detail
+                    NoteDes.value = res.data.data.customer_detail.note
                     let guestFullName = guestDetail.first_name + ' ' + guestDetail.last_name
 
                     //console.log(guestDetail,"guestDetail");

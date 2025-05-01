@@ -5,10 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PmsApi;
 use App\Http\Controllers\RuBookingController;
 use App\Http\Controllers\RuLiveNotificationWebhookController;
-use App\Http\Controllers\PmsApi\HyperGuestController;
-use App\Http\Controllers\PmsApi\HyperGuest\HyperGuestAvailibilty;
-use App\Http\Controllers\PmsApi\HyperGuest\HyperGuestRate;
-
+use App\Http\Controllers\RazorpayController;
 //use App\Http\Controllers\PmsApi\Location;
 
 /*
@@ -22,30 +19,14 @@ use App\Http\Controllers\PmsApi\HyperGuest\HyperGuestRate;
 |
 */
 Route::any('get/hyperguest/webhook', [PmsApi\DashboardController::class, 'hyperGuestResponse']);
-Route::any('envelope/booking/OTA/reservation', [PmsApi\DashboardController::class, 'hyperGuestResponseNew']);
-
-
-
-Route::post('linechart', [PmsApi\DashboardController::class, 'dashboardLineChart']);
-Route::post('dashboard', [PmsApi\DashboardController::class, 'dashboardAnalytics']);
-Route::post('weeklyreport', [PmsApi\DashboardController::class, 'dashboardWeeklyReport']);
-Route::post('channelrevenue', [PmsApi\DashboardController::class, 'dashboardChannelRevenue']);
-Route::get('dashboard/property', [PmsApi\DashboardController::class, 'property']);
-Route::get('dashboard/location', [PmsApi\DashboardController::class, 'location']);
-Route::get('dashboard/channel', [PmsApi\DashboardController::class, 'channel']);
-Route::post('net-revenue', [PmsApi\DashboardController::class, 'netRevenueDetails']);
-Route::post('average-price-per-night', [PmsApi\DashboardController::class, 'averagePricePerNightDetails']);
-Route::post('bookings-created', [PmsApi\DashboardController::class, 'bookingsCreatedDetails']);
-
+Route::any('envelope/booking/OTA/reservation', [PmsApi\HyperGuestController::class, 'hyperGuestResponseNew']);
+Route::get('sync-hyperguest', [PmsApi\HyperGuestController::class, 'syncHyperguestAvailabilityandRate']);
 
 Route::post('upload', [PmsApi\UploadController::class, 'upload']);
 Route::any('ru/webhook/get/bookings/{hash?}', [RuBookingController::class, 'getBookingFromRu']);
 Route::any('ru/webhook/get/live/notification/{hash?}', [RuLiveNotificationWebhookController::class, 'getLiveNotificationWebhook']);
 Route::middleware('auth:sanctum')->group(function() {
     ////////////////////////////////////
-    
-    
-    
     Route::post("/pms-logout",[PmsApi\PmsAuthController::class,'logout']);
     Route::post("/pms-changepassword",[PmsApi\PmsAuthController::class,'changepassword']);
     // Service based contrllers and routes
@@ -56,31 +37,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('location-delete-multiple', [PmsApi\LocationController::class, 'deleteMultipleRecord']);
     Route::get('location-by-state/{state_id}', [PmsApi\LocationController::class, 'getLocations']);
     Route::get('location/get/all', [PmsApi\LocationController::class, 'allLocation']);
-    Route::get('location-image-delete/{id}', [PmsApi\LocationController::class, 'deleteImageLocation']);
-    Route::post('show-on-home-location/{id}', [PmsApi\LocationController::class, 'updateShowOnLocation']);
-    
-    
-    Route::resource('collection', PmsApi\CollectionController::class);
-    Route::post('collection/{id}', [PmsApi\CollectionController::class, 'update']);
-    Route::post('collection-update-status/{id}', [PmsApi\CollectionController::class, 'updateStatus']);
-    Route::post('collection-delete-multiple', [PmsApi\CollectionController::class, 'deleteMultipleRecord']);
-    Route::get('get-collection', [PmsApi\CollectionController::class, 'getCollection']);
-    Route::get('collection/get/all', [PmsApi\CollectionController::class, 'allLocation']);
-    Route::get('collection-image-delete/{id}', [PmsApi\CollectionController::class, 'deleteImageLocation']);
-    Route::post('show-on-home-collection/{id}', [PmsApi\CollectionController::class, 'updateShowOnCollection']);
-    
-    Route::resource('terms-and-condition', PmsApi\TermsandConditionController::class);
-    Route::post('terms-and-condition', [PmsApi\TermsandConditionController::class, 'store']);
-    Route::post('terms-and-condition/{id}', [PmsApi\TermsandConditionController::class, 'update']);
-    
-    Route::resource('cancellation-policy', PmsApi\CancellationPolicyController::class);
-    Route::post('cancellation-policy', [PmsApi\CancellationPolicyController::class, 'store']);
-    Route::post('cancellation-policy/{id}', [PmsApi\CancellationPolicyController::class, 'update']);
-    
-    Route::resource('privacy-policy', PmsApi\PrivacyPolicyController::class);
-    Route::post('privacy-policy', [PmsApi\PrivacyPolicyController::class, 'store']);
-    Route::post('privacy-policy/{id}', [PmsApi\PrivacyPolicyController::class, 'update']);
-    
    //----------------------Company api -----------------------------------//
     Route::resource('company', PmsApi\CompanyController::class);
     Route::post('company/{id}', [PmsApi\CompanyController::class, 'update']);
@@ -118,9 +74,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::resource('home', PmsApi\HomeController::class);
     Route::post('home/{id}', [PmsApi\HomeController::class, 'update']);
     Route::post('home-update-status/{id}', [PmsApi\HomeController::class, 'updateStatus']);
-    Route::post('show-on-home-update/{id}', [PmsApi\HomeController::class, 'updateShowOnHome']);
-    Route::post('show-enquiry-update/{id}', [PmsApi\HomeController::class, 'updateOnlyForEnquiry']);
-     Route::post('show-on-apartment-update/{id}', [PmsApi\HomeController::class, 'updateShowOnApartment']);
     Route::post('home-delete-multiple', [PmsApi\HomeController::class, 'deleteMultipleRecord']);
     Route::get('home-image-delete/{id}', [PmsApi\HomeController::class, 'deleteImage']);
     Route::post('home-gallery', [PmsApi\HomeController::class, 'saveGallery']);
@@ -139,13 +92,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('save-additional-charges', [PmsApi\HomeController::class, 'saveHomeAdditionalCharge']);
     Route::delete('delete-additional-charge/{id}', [PmsApi\HomeController::class, 'deleteHomeAdditionalCharge']);
     Route::post('save-owner-detail', [PmsApi\HomeController::class, 'saveHomeOwnerDetail']);
-    Route::get('icons-image-delete/{id}', [PmsApi\HomeController::class, 'deleteImage']);
-    Route::get('get-home-tags/{id}', [PmsApi\HomeController::class, 'showAllTags']);
-    Route::post('save-home-tags', [PmsApi\HomeController::class, 'saveTags']);
-    Route::get('pdf-brochure-delete/{id}', [PmsApi\HomeController::class, 'deleteImagebrochure']);
     Route::get('review_image', [PmsApi\HomeController::class, 'getReviewImage']);
-    
-    
     //----------------------End of Home api -----------------------------------//
     //----------------------FAQs api -----------------------------------//
     Route::resource('faqs', PmsApi\FaqsController::class);
@@ -180,27 +127,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('/home-banner-delete-image/{id}', [PmsApi\HomeBannerController::class,'deleteImage'])->name('home-banner-delete-image');
     Route::post('home-banner-update-status/{id}', [PmsApi\HomeBannerController::class, 'updateStatus']);
 
-    Route::resource('footer-banner-content', PmsApi\HomeFooterBannerController::class);
-    Route::post('home-footer-banner', [PmsApi\HomeFooterBannerController::class, 'saveFooterContent']);
-    Route::post('home-footer-banner/{id}', [PmsApi\HomeFooterBannerController::class, 'updateFooterContent']);
-
-    Route::resource('addventure-content', PmsApi\AddventureController::class);
-    Route::post('save-addventure', [PmsApi\AddventureController::class, 'saveAddventure']);
-    Route::delete('delete-addventure/{id}', [PmsApi\AddventureController::class, 'deleteAddventure']);
-
-
-  //----------------------Tags api -----------------------------------//
-   Route::resource('tags', PmsApi\TagsController::class);
-   Route::post('tags/{id}', [PmsApi\TagsController::class, 'update']);
-   Route::post('tags-update-status/{id}', [PmsApi\TagsController::class, 'updateStatus']);
-   Route::post('tags-delete-multiple', [PmsApi\TagsController::class, 'deleteMultipleRecord']);
-   Route::get('tags-image-delete/{id}', [PmsApi\TagsController::class, 'deleteImage']);
-   Route::post('show-on-home-tag/{id}', [PmsApi\TagsController::class, 'updateShowOnTag']);
-
-   //----------------------End of Tags api -----------------------------------//
-
-
-
     // ------------------------------------- Our Diffrence --------------------------------------------//
     Route::resource('our-difference', PmsApi\OurDifferenceController::class);
     Route::post('our-difference', [PmsApi\OurDifferenceController::class, 'store']);
@@ -215,8 +141,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('special-invitation-update-status/{id}', [PmsApi\SpecialInvitationController::class, 'updateStatus']);
     Route::get('special-invitation-delete-image/{id}', [PmsApi\SpecialInvitationController::class, 'deleteimage']);
     Route::post('special-invitation-save-position', [PmsApi\SpecialInvitationController::class, 'savePosition']);
-    Route::get('coupon_code', [PmsApi\SpecialInvitationController::class, 'getCouponCode']);
-    
     // ---------------------------------------- Testimonial -----------------------------------------//
     Route::resource('testimonials', PmsApi\TestimonialController::class);
     Route::post('testimonials/{id}', [PmsApi\TestimonialController::class, 'update']);
@@ -237,9 +161,8 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('/property/booking/payment/request', [PmsApi\PropertyController::class, 'saveBookingPaymentRequest']);
     Route::get('/cancel/booking/{id}', [PmsApi\PropertyController::class, 'cancelBooking']);
     Route::get('/property/booking/list/test/{role?}/{userId?}', [PmsApi\PropertyController::class, 'propertyBookingListTest']);
-
+    
     Route::post('/property/booking/deleteguestfile', [PmsApi\PropertyController::class, 'deletePropertyBookingImage']);
-
 
     Route::post('/property/booking/payment/request/update', [PmsApi\PropertyController::class, 'updatePaymentRequest']);
     Route::post('/property/booking/payment/request/status/update', [PmsApi\PropertyController::class, 'updatePaymentRequestStatus']);
@@ -258,9 +181,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('blogs-update-status/{id}', [PmsApi\BlogController::class, 'updateStatus']);
     Route::get('blogs-delete-image/{id}', [PmsApi\BlogController::class, 'deleteImage']);
     Route::post('blogs-delete-multiple-record', [PmsApi\BlogController::class, 'deleteMultipleRecord']);
-    
-    Route::post('show-on-home-blog/{id}', [PmsApi\BlogController::class, 'updateShowOnBlog']);
-    
     // --------------------------------------------- Join Our Network Intro --------------------------------//
     Route::resource('join-our-network-intro', PmsApi\JoinOurNetworkIntroController::class);
     Route::delete('join-our-network-intro', [PmsApi\JoinOurNetworkIntroController::class, 'destroy']);
@@ -289,13 +209,13 @@ Route::get('/get/property/by/propertyTypes', [PmsApi\CouponCodeController::class
 Route::get('/get/coupon/code/list', [PmsApi\CouponCodeController::class, 'list']);
 Route::get('/coupon/code/show/{id}', [PmsApi\CouponCodeController::class, 'show']);
 Route::post('/coupon/code/save', [PmsApi\CouponCodeController::class, 'save']);
-Route::delete('/coupon/code/delete', [PmsApi\CouponCodeController::class, 'destroy']);
+Route::delete('/coupon/code/delete/{id}', [PmsApi\CouponCodeController::class, 'destroy']);
 Route::post('/coupon/code/update/status/{id}', [PmsApi\CouponCodeController::class, 'updateStatus']);
 Route::delete('/coupon/code/delete/multiple', [PmsApi\CouponCodeController::class, 'deleteMultipleRecord']);
 Route::post('/guest/database', [PmsApi\CouponCodeController::class, 'getGuestDatabase']);
 Route::post('/guest/database/export', [PmsApi\CouponCodeController::class, 'guestDatabaseExport']);
 Route::get('/property/booking/detail/{id}', [PmsApi\PropertyController::class, 'getPropertyBooking']);
-Route::post('couponcode/export', [PmsApi\CouponCodeController::class, 'couponCodeExport']);
+
 
 Route::post('sale/report/{role?}/{userId?}', [PmsApi\PropertyController::class, 'saleReport']);
 Route::post('/get/booking/sale/report/export', [PmsApi\PropertyController::class, 'saleReportExport']);
@@ -305,7 +225,76 @@ Route::post('police/verification/report/export', [PmsApi\PropertyController::cla
 
 Route::post("/pms-login",[PmsApi\PmsAuthController::class,'pms_login']);
 
-Route::get('/hyper-guest', [HyperGuestController::class, 'fetchHotel']);
-Route::get('/hyper-guest-availibity-push', [HyperGuestAvailibilty::class, 'availibityPush']);
-Route::get('/hyper-guest-rate-push', [HyperGuestRate::class, 'ratePush']);
+
+//-------------------------------new changes January 23, 2025------------------------------------------//
+Route::post('linechart', [PmsApi\DashboardController::class, 'dashboardLineChart']);
+Route::post('dashboard', [PmsApi\DashboardController::class, 'dashboardAnalytics']);
+Route::post('weeklyreport', [PmsApi\DashboardController::class, 'dashboardWeeklyReport']);
+Route::post('channelrevenue', [PmsApi\DashboardController::class, 'dashboardChannelRevenue']);
+Route::get('dashboard/property', [PmsApi\DashboardController::class, 'property']);
+Route::get('dashboard/location', [PmsApi\DashboardController::class, 'location']);
+Route::get('dashboard/channel', [PmsApi\DashboardController::class, 'channel']);
+Route::post('net-revenue', [PmsApi\DashboardController::class, 'netRevenueDetails']);
+Route::post('average-price-per-night', [PmsApi\DashboardController::class, 'averagePricePerNightDetails']);
+Route::post('bookings-created', [PmsApi\DashboardController::class, 'bookingsCreatedDetails']);
+
+Route::get('location-image-delete/{id}', [PmsApi\LocationController::class, 'deleteImageLocation']);
+Route::post('show-on-home-location/{id}', [PmsApi\LocationController::class, 'updateShowOnLocation']);
+
+
+Route::resource('collection', PmsApi\CollectionController::class);
+Route::post('collection/{id}', [PmsApi\CollectionController::class, 'update']);
+Route::post('collection-update-status/{id}', [PmsApi\CollectionController::class, 'updateStatus']);
+Route::post('collection-delete-multiple', [PmsApi\CollectionController::class, 'deleteMultipleRecord']);
+Route::get('get-collection', [PmsApi\CollectionController::class, 'getCollection']);
+Route::get('collection/get/all', [PmsApi\CollectionController::class, 'allLocation']);
+Route::get('collection-image-delete/{id}', [PmsApi\CollectionController::class, 'deleteImageLocation']);
+Route::post('show-on-home-collection/{id}', [PmsApi\CollectionController::class, 'updateShowOnCollection']);
+
+Route::resource('terms-and-condition', PmsApi\TermsandConditionController::class);
+Route::post('terms-and-condition', [PmsApi\TermsandConditionController::class, 'store']);
+Route::post('terms-and-condition/{id}', [PmsApi\TermsandConditionController::class, 'update']);
+
+Route::resource('cancellation-policy', PmsApi\CancellationPolicyController::class);
+Route::post('cancellation-policy', [PmsApi\CancellationPolicyController::class, 'store']);
+Route::post('cancellation-policy/{id}', [PmsApi\CancellationPolicyController::class, 'update']);
+
+Route::resource('privacy-policy', PmsApi\PrivacyPolicyController::class);
+Route::post('privacy-policy', [PmsApi\PrivacyPolicyController::class, 'store']);
+Route::post('privacy-policy/{id}', [PmsApi\PrivacyPolicyController::class, 'update']);
+
+Route::post('show-on-home-update/{id}', [PmsApi\HomeController::class, 'updateShowOnHome']);
+Route::post('show-enquiry-update/{id}', [PmsApi\HomeController::class, 'updateOnlyForEnquiry']);
+Route::post('show-on-apartment-update/{id}', [PmsApi\HomeController::class, 'updateShowOnApartment']);
+
+
+Route::get('icons-image-delete/{id}', [PmsApi\HomeController::class, 'deleteImage']);
+Route::get('get-home-tags/{id}', [PmsApi\HomeController::class, 'showAllTags']);
+Route::post('save-home-tags', [PmsApi\HomeController::class, 'saveTags']);
+Route::get('pdf-brochure-delete/{id}', [PmsApi\HomeController::class, 'deleteImagebrochure']);
+
+
+Route::resource('footer-banner-content', PmsApi\HomeFooterBannerController::class);
+Route::post('home-footer-banner', [PmsApi\HomeFooterBannerController::class, 'saveFooterContent']);
+Route::post('home-footer-banner/{id}', [PmsApi\HomeFooterBannerController::class, 'updateFooterContent']);
+
+Route::resource('addventure-content', PmsApi\AddventureController::class);
+Route::post('save-addventure', [PmsApi\AddventureController::class, 'saveAddventure']);
+Route::delete('delete-addventure/{id}', [PmsApi\AddventureController::class, 'deleteAddventure']);
+
+//----------------------Tags api -----------------------------------//
+Route::resource('tags', PmsApi\TagsController::class);
+Route::post('tags/{id}', [PmsApi\TagsController::class, 'update']);
+Route::post('tags-update-status/{id}', [PmsApi\TagsController::class, 'updateStatus']);
+Route::post('tags-delete-multiple', [PmsApi\TagsController::class, 'deleteMultipleRecord']);
+Route::get('tags-image-delete/{id}', [PmsApi\TagsController::class, 'deleteImage']);
+Route::post('show-on-home-tag/{id}', [PmsApi\TagsController::class, 'updateShowOnTag']);
+//----------------------End of Tags api -----------------------------------//
+
+Route::get('coupon_code', [PmsApi\SpecialInvitationController::class, 'getCouponCode']);
+Route::post('show-on-home-blog/{id}', [PmsApi\BlogController::class, 'updateShowOnBlog']);
+Route::post('couponcode/export', [PmsApi\CouponCodeController::class, 'couponCodeExport']);
+Route::any('/webhook/callback', [RazorpayController::class, 'handleWebhookCallBack'])->name('handle.razorpay.callback');
+
+
 

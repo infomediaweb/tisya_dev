@@ -31,7 +31,24 @@ class TblHomeImageVideo extends Model{
         'filename' => 'string',
     ];
 
-  public function getFilenameAttribute($value){
+    // public function getFilenameAttribute($value){
+    //     $videoExtensionArray = array('flv', 'm3u8', 'mp4', 'ts', '3gp', 'mov', 'avi', 'wmv');
+    //     $expolode = explode('.', $value);
+    //     $folder = 'images';
+    //     if(in_array($expolode[1], $videoExtensionArray)){
+    //         $folder = 'video';
+    //     }
+    //     $path= 'storage/home/'.$folder.'/'.$value;
+    //     if(file_exists($path)){
+    //         $path= 'storage/home/'.$folder.'/'.$value;
+    //     }
+    //     else{
+    //         $path= 'assets/images/noimage-property.jpg';
+    //     }
+    //     return $path;
+    // }
+    
+    public function getFilenameAttribute($value){
         $videoExtensionArray = array('flv', 'm3u8', 'mp4', 'ts', '3gp', 'mov', 'avi', 'wmv');
         $expolode = explode('.', $value);
         $folder = 'images';
@@ -79,4 +96,6 @@ class TblHomeImageVideo extends Model{
 
         return file_exists(public_path($path)) ? url($path) : asset('assets/images/noimage-property.jpg');
     }
+    
+    
 }

@@ -46,8 +46,9 @@
                                                 @change="onCheckAll"
                                             >
                                         </th>
-                                        <th width="100px" class="text-secondary fw-semibold">Image</th>
-                                        <th class="text-secondary fw-semibold">Name</th>
+                                        <th width="20%" class="text-secondary fw-semibold">Image</th>
+                                        <th width="30%" class="text-secondary fw-semibold">Name</th>
+                                        <th class="fw-semibold">Show On Filter</th>
                                         <th width="10%" class="text-secondary fw-semibold">Status</th>
                                         <th  style="width:90px;" class="text-secondary fw-semibold">Action</th>
                                     </tr>
@@ -72,6 +73,20 @@
                                             >
                                         </td>
                                         <td>{{ obj.amenities_name }}</td>
+                                        <td>
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                role="switch"
+                                                id="s1"
+                                                :checked="obj.show_on_filter == 1"
+                                                @change="updateShowOnFilter(obj.id, $event)"
+                                                true-value="1"
+                                                false-value="0"
+                                            >
+                                        </div>
+                                        </td>
                                         <td>
                                             <div class="form-check form-switch">
                                                 <input
@@ -292,7 +307,17 @@
             console.log(error)
         })
     }
-
+    const updateShowOnFilter = (v, {target}) => {
+        axios.post(`/api/show-on-home-filter/${v}`, {
+            show_on_filter: Number(target.checked)
+        }).then(res => {
+            if(res.data.status){
+                toast(res.data.message, 'success').show()
+            }
+        }).catch(error => {
+            console.log(error)
+        })
+    }
 
     onMounted(() => {
         getAmenitiesList()

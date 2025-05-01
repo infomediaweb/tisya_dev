@@ -18,6 +18,7 @@ use App\Models\PropertyBookingPaymentRequest;
 use App\Mail\BookingConfirmationEmail;
 use App\Mail\BookingConfirmationEmailToAdmin;
 use App\Services\RazorpayService;
+use Razorpay\Api\Api;
 use DB;
 use Mail;
 
@@ -26,8 +27,8 @@ class ScriptController extends Controller{
     public function ru(){
         $xml = "<Push_PutAvbUnits_RQ>
                             <Authentication>
-                                <UserName</UserName>
-                                <Password></Password>
+                                <UserName>Gagan@tisyastays.com</UserName>
+                                <Password>Tisyastays@1234</Password>
                             </Authentication>
                             <MuCalendar PropertyID='3826813'>
                                 <Date From='2024-06-25' To='2024-06-28'>
@@ -161,7 +162,7 @@ class ScriptController extends Controller{
     }
 
     public function getRuBookingById(){
-        $reservationId =  '142232714';
+        $reservationId =  '142929272';
         $xmlReqForPropertyPrice = "<Pull_GetReservationByID_RQ>
             <Authentication>
                 <UserName>".config('ru.RU_USER_NAME')."</UserName>
@@ -171,14 +172,16 @@ class ScriptController extends Controller{
         </Pull_GetReservationByID_RQ>";
         $response = MasterHelper::makeXmlRequest($xmlReqForPropertyPrice);
         $reservation = $response['data']['Reservation'];
+        
+        
+ 
+     
 
-       
-              
         if(isset($reservation['ReservationID'])){
             if($reservation['StatusID'] =='1' || $reservation['StatusID'] =='3'){
               
                 $propertyBooking = array();
-                if($reservation['Creator']=='gagan@tisyastays.com' || $reservation['Creator'] =='agoda@rentalsunited.com'){
+                if($reservation['Creator']=='gagan@tisyastays.com'){
                     $stayInfo =  $reservation['StayInfos']['StayInfo'];
                     $customerInfo =  $reservation['CustomerInfo'];
 
@@ -195,8 +198,10 @@ class ScriptController extends Controller{
                     $propertyBooking['booking_created_by'] = 'ru';
                     $propertyBooking['booking_from'] = 'ru';
                     $propertyBooking['ru_booking_status'] = 'Confirmed';
+                       $propertyBooking['payment_status'] = 'Paid';
+                    $propertyBooking['property_booking_status'] = 'Confirmed';
                     $propertyBooking['type'] = 'Location';
-                    $propertyBooking['channel'] = 'Agoda';
+                    $propertyBooking['channel'] = 'RU';
                     $propertyBooking['no_of_adult'] = $stayInfo['NumberOfGuests'];
                     $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>$customerInfo['SurName'], 'email'=>$customerInfo['Email'] , 'mobile_number'=>$customerInfo['MessagingContactId']));
                     $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($stayInfo['DateFrom']));
@@ -221,6 +226,8 @@ class ScriptController extends Controller{
                     $propertyBooking['ru_booking_status'] = 'Confirmed';
                     $propertyBooking['type'] = 'Location';
                     $propertyBooking['channel'] = 'Booking.com';
+                       $propertyBooking['payment_status'] = 'Paid';
+                    $propertyBooking['property_booking_status'] = 'Confirmed';
                     $propertyBooking['no_of_adult'] = $stayInfo['NumberOfGuests'];
                     $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>$customerInfo['SurName'], 'email'=>$customerInfo['Email'] , 'mobile_number'=>$customerInfo['Phone']));
                     $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($stayInfo['DateFrom']));
@@ -247,6 +254,8 @@ class ScriptController extends Controller{
                         $propertyBooking['ru_booking_status'] = 'Confirmed';
                         $propertyBooking['type'] = 'Location';
                         $propertyBooking['channel'] = 'Airbnb';
+                           $propertyBooking['payment_status'] = 'Paid';
+                    $propertyBooking['property_booking_status'] = 'Confirmed';
                         $propertyBooking['no_of_adult'] = $stayInfo['NumberOfGuests'];
                         $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>$customerInfo['SurName'], 'email'=>$customerInfo['Email'] , 'mobile_number'=>$customerInfo['Phone']));
                         $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($stayInfo['DateFrom']));
@@ -267,6 +276,8 @@ class ScriptController extends Controller{
                         $propertyBooking['ru_booking_status'] = 'Confirmed';
                         $propertyBooking['type'] = 'Location';
                         $propertyBooking['channel'] = 'Airbnb';
+                           $propertyBooking['payment_status'] = 'Paid';
+                    $propertyBooking['property_booking_status'] = 'Confirmed';
                         $propertyBooking['no_of_adult'] = $reservation['NumberOfGuests'];
                         $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>($customerInfo['SurName']=='not provided'?'':$customerInfo['SurName']), 'email'=>$customerInfo['Email'] , 'mobile_number'=>(isset($customerInfo['MobilePhone'][0]))?$customerInfo['MobilePhone'][0]:'N/A'));
                         $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($reservation['DateFrom']));
@@ -292,6 +303,8 @@ class ScriptController extends Controller{
                     $propertyBooking['ru_booking_status'] = 'Confirmed';
                     $propertyBooking['type'] = 'Location';
                     $propertyBooking['channel'] = 'MakeMyTrip';
+                       $propertyBooking['payment_status'] = 'Paid';
+                    $propertyBooking['property_booking_status'] = 'Confirmed';
                     $propertyBooking['no_of_adult'] = $stayInfo['NumberOfGuests'];
                     $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>$customerInfo['SurName'], 'email'=>$customerInfo['Email'] , 'mobile_number'=>'N/A'));
                     $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($stayInfo['DateFrom']));
@@ -321,6 +334,32 @@ class ScriptController extends Controller{
                 $gstPrecentage = (integer)$getAppliedGst->gst_percentage;
                 PropertyBooking::where('id', $booking->id)->update(['tax'=>$gstPrecentage, 'taxable_amount'=>$gst_amount]);
             }
+        }
+    }
+    
+    
+    public function refundPayment() {
+        try {
+            $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
+            $payment = $api->payment->fetch('pay_PnZmjA2Ij5pJey');
+            $refund = $payment->refund(['amount' => 100]);
+            dd($refund);
+            $paymentLinks = $api->invoice->all();
+            dd($paymentLinks);
+            if (!empty($paymentLink['payments'])) {
+                $paymentIds = $paymentLink['payments']; 
+                $payments = [];
+                foreach ($paymentIds as $paymentId) {
+                    $payments[] = $api->payment->fetch($paymentId);
+                }
+                dd($payments); 
+            }
+            else{
+                dd('No payments found for this payment link.');
+            }
+        }
+        catch (\Exception $e) {
+            dd('Error: ' . $e->getMessage());
         }
     }
 

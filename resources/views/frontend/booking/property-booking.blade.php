@@ -5,6 +5,7 @@
         background-color: #dc3545 !important
     }
 </style>
+
 <section class="section section-top section-booking">
     <div class="container">
         <form action="#" method="post" id="yourFormId">
@@ -270,8 +271,6 @@
                                 </div>
                             </div>
                             
-                            
-                            
                             <div class="col-12 col-lg-6">
                                 <div class="form-group">
                                     <label>Email Address <sup>*</sup></label>
@@ -292,7 +291,7 @@
                             </div>
                             <div class="col-12 col-lg-6">
                                 <div class="form-group">
-                                    <label>Address</label>
+                                    <label>Address </label>
                                     <input type="text" class="form-control" name="address" id="address" value="{{ old('addresss') }}">
                                 </div>
                             </div>
@@ -365,7 +364,7 @@
 
                                         @if($requestParameters['total_extra_guest_charge'] != 0)
                                         <tr class="second-tr">
-                                            <td> Extra charge (<span class="extraGuestCharge">{{ $requestParameters['extra_guest_charge'] ?? '' }}</span>
+                                            <td> Extra charge (<span class="extraGuestCharge">{{ $requestParameters['extra_guest_charge']*(isset($requestParameters['extraGuest'])?$requestParameters['extraGuest']:$requestParameters['tot_guest']) ?? '' }}</span>
                                                      x <span class="totalNight">{{ $requestParameters['tot_no_of_days'] ?? '' }}</span> )</td>
                                             <td align="right">&#8377; <span class="totalExtraGuestCharge">{{ $requestParameters['total_extra_guest_charge'] ?? '' }}</span></td>
                                         </tr>
@@ -408,7 +407,32 @@
 <script>
     
     document.addEventListener("DOMContentLoaded", function(){
-          new Swiper(".swiper-property-image", {
+        
+        fbq('track', 'AddToCart', {
+            property_name: "{{ addslashes($property->home_name) }}", 
+            currency: "INR",
+            country: "India",
+            value: "{{ $requestParameters['num_formatted_tot_price'] ?? 0 }}", 
+            checkin_date: "{{ isset($requestParameters['ci_date']) ? date('d M Y', strtotime($requestParameters['ci_date'])) : '' }}", 
+            checkout_date: "{{ isset($requestParameters['co_date']) ? date('d M Y', strtotime($requestParameters['co_date'])) : '' }}", 
+            property_type: "{{ addslashes($property->home_type) }}", 
+            num_guest: "{{ isset($requestParameters['tot_guest']) ? $requestParameters['tot_guest'] . ($requestParameters['tot_guest'] == 1 ? ' Guest' : ' Guests') : '' }}"
+        });
+        
+        gtag('event', 'conversion', {
+            'send_to': 'AW-16482594363/hu9sCLCxtpcaELvcwbM9',
+            'property_name': '{{ addslashes($property->home_name) }}', 
+            'currency': 'INR',
+            'country': 'India',
+            'value': "{{ $requestParameters['num_formatted_tot_price'] ?? 0 }}", 
+            'checkin_date': "{{ isset($requestParameters['ci_date']) ? date('d M Y', strtotime($requestParameters['ci_date'])) : '' }}", 
+            'checkout_date': "{{ isset($requestParameters['co_date']) ? date('d M Y', strtotime($requestParameters['co_date'])) : '' }}", 
+            'property_type': "{{ addslashes($property->home_type) }}", 
+            'num_guest': "{{ isset($requestParameters['tot_guest']) ? $requestParameters['tot_guest'] . ($requestParameters['tot_guest'] == 1 ? ' Guest' : ' Guests') : '' }}"
+        });
+        
+        
+        new Swiper(".swiper-property-image", {
             spaceBetween: 30,
             allowTouchMove: false,
             pagination: {
@@ -442,6 +466,22 @@
         $.each(requestParameters, function (key, value) {
             formdata += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
         });
+        
+        fbq('track', 'InitiateCheckout', {
+            property_name: "{{ addslashes($property->home_name) }}",
+            currency: "INR",
+            country: "India",
+            value: "{{ $requestParameters['num_formatted_tot_price'] ?? 0 }}"
+        });
+        
+        gtag('event', 'conversion', {
+            'send_to': 'AW-16482594363/ML2HCKbZxZcaELvcwbM9',
+            'property_name': "{{ addslashes($property->home_name) }}",
+            'currency': "INR",
+            'country': "India",
+            'value': "{{ $requestParameters['num_formatted_tot_price'] ?? 0 }}"
+        });
+
 
         $.ajax({
             url: "{{ route('property-booking') }}",  

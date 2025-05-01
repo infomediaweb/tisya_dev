@@ -16,12 +16,12 @@ class TblState extends Model
         'status',
     ];
     
+     public function locations()
+{
+    return $this->hasMany(TblLocation::class, 'state_id');
+}
+
     public function companyInfo(){
         return $this->hasOne(TblCompany::class, 'state_id', 'id');
-    }
-    
-    public function locations()
-    {
-        return $this->hasMany(TblLocation::class, 'state_id');
     }
 }

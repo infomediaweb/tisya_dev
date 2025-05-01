@@ -1,34 +1,70 @@
 <template>
     <Form @submit="onSubmit" v-slot="{ meta, values, errors }">
         <div class="row">
-            <div class="col-12 col-lg-6">
+            <div class="col-12 col-lg-4">
                 <div class="form-group">
                     <label for="">Name<span class="text-danger">*</span></label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="home_name"
                         class="form-control"
-                        :class="{'border-danger': errors.home_name}" 
+                        :class="{'border-danger': errors.home_name}"
                         v-model="homeEdit.home_name"
                         rules="required"
                     />
                 </div>
             </div>
 
-            <div class="col-12 col-lg-6">
+            <div class="col-12 col-lg-4">
                 <div class="form-group">
                     <label for="">Ru ID<span class="text-danger">*</span></label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="ru_property_id"
                         class="form-control"
-                        :class="{'border-danger': errors.ru_property_id}" 
+                        :class="{'border-danger': errors.ru_property_id}"
                         v-model="homeEdit.ru_property_id"
                         rules="required"
                     />
                 </div>
             </div>
-  
+            <div class="col-12 col-lg-4">
+                <div class="form-group">
+                    <label for="">Hyper Guest ID</label>
+                    <Field
+                        type="text"
+                        name="hyper_guest_id"
+                        class="form-control"
+                        :class="{'border-danger': errors.hyper_guest_id}"
+                        v-model="homeEdit.hyper_guest_id"
+                    />
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="form-group">
+                    <label for="">Hyper per night price</label>
+                    <Field
+                        type="number"
+                        name="hyper_per_night_price"
+                        class="form-control"
+                        :class="{'border-danger': errors.hyper_per_night_price}"
+                        v-model="homeEdit.hyper_per_night_price"
+                    />
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="form-group">
+                    <label for="">Internal name<span class="text-danger">*</span></label>
+                    <Field
+                        type="text"
+                        name="internal_name"
+                        class="form-control"
+                        :class="{'border-danger': errors.internal_name}"
+                        v-model="homeEdit.internal_name"
+                        rules="required"
+                    />
+                </div>
+            </div>
             <!--Break Column-->
             <!-- <div class="w-100"></div> -->
             <!--Break Column-->
@@ -36,7 +72,7 @@
             <div class="col-12 col-lg-4">
                 <div class="form-group">
                     <label for="">Category<span class="text-danger">*</span></label>
-                    <Field 
+                    <Field
                         as="select"
                         name="home_type_id"
                         class="form-control"
@@ -44,20 +80,20 @@
                         v-model="vHomeTypeId"
                         rules="required">
                         <option value="" selected disabled>Select Category</option>
-                        <option 
-                            v-for="(obj, index) in homeType" 
+                        <option
+                            v-for="(obj, index) in homeType"
                             :key="index"
                             :value="obj.id">
                             {{ obj.name }}
                         </option>
                     </Field>
                 </div>
-            </div> 
-            
+            </div>
+
             <div class="col-12 col-lg-4">
                 <div class="form-group">
                     <label for="">State<span class="text-danger">*</span></label>
-                    <Field 
+                    <Field
                         as="select"
                         name="state_id"
                         class="form-control"
@@ -66,20 +102,20 @@
                         @change="getLocation"
                         rules="required">
                         <option value="" selected disabled>Select State</option>
-                        <option 
-                            v-for="(obj, index) in state" 
+                        <option
+                            v-for="(obj, index) in state"
                             :key="index"
                             :value="obj.id">
                             {{ obj.name }}
                         </option>
                     </Field>
                 </div>
-            </div> 
+            </div>
 
             <div class="col-12 col-lg-4">
                 <div class="form-group">
                     <label for="">Location<span class="text-danger">*</span></label>
-                    <Field 
+                    <Field
                         as="select"
                         name="location_id"
                         class="form-control"
@@ -87,20 +123,20 @@
                         v-model="vLocationId"
                         rules="required">
                         <option value="" selected disabled>Select Location</option>
-                        <option 
-                            v-for="(obj, index) in location" 
+                        <option
+                            v-for="(obj, index) in location"
                             :key="index"
                             :value="obj.id">
                             {{ obj.location_name }}
                         </option>
                     </Field>
                 </div>
-            </div>  
-            
+            </div>
+
             <!-- <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Collection</label>
-                    <Field 
+                    <Field
                         as="select"
                         name="collection_id"
                         class="form-control"
@@ -108,8 +144,8 @@
                         v-model="vCollectionId"
                         >
                         <option value="" selected >Select Collection</option>
-                        <option 
-                            v-for="(obj, index) in collection" 
+                        <option
+                            v-for="(obj, index) in collection"
                             :key="index"
                             :value="obj.id">
                             {{ obj.collection_name }}
@@ -140,8 +176,8 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Capacity<span class="text-danger">*</span></label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="guests_included"
                         class="form-control"
                         :class="{'border-danger': errors.guests_included}"
@@ -154,8 +190,8 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Max Occupancy<span class="text-danger">*</span></label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="maximum_number_of_guests"
                         class="form-control"
                         :class="{'border-danger': errors.maximum_number_of_guests}"
@@ -163,9 +199,9 @@
                         v-model="homeEdit.maximum_number_of_guests"
                         data-bs-toggle="tooltip"
                     />
-                    <Tooltip 
+                    <Tooltip
                         :error="errors.maximum_number_of_guests"
-                        :message="'Value should be greater than capacity'"  
+                        :message="'Value should be greater than capacity'"
                     />
                 </div>
             </div>
@@ -173,8 +209,8 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Extra guest charge</label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="extra_guest_charges"
                         class="form-control"
                         :class="{'border-danger': errors.no_of_staff}"
@@ -187,8 +223,8 @@
             <!-- <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">No of Nights<span class="text-danger">*</span></label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="home_no_night"
                         class="form-control"
                         :class="{'border-danger': errors.home_no_night}"
@@ -200,8 +236,8 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Number of Staff</label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="no_of_staff"
                         class="form-control"
                         :class="{'border-danger': errors.no_of_staff}"
@@ -214,8 +250,8 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Bedrooms<span class="text-danger">*</span></label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="no_of_bedrooms"
                         class="form-control"
                         :class="{'border-danger': errors.no_of_bedrooms}"
@@ -228,8 +264,8 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Bathrooms<span class="text-danger">*</span></label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="no_of_bathrooms"
                         class="form-control"
                         :class="{'border-danger': errors.no_of_bathrooms}"
@@ -243,7 +279,7 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Arrival Time<span class="text-danger">*</span></label>
-                    <Field 
+                    <Field
                         as="select"
                         name="arrival_time"
                         class="form-control"
@@ -251,8 +287,8 @@
                         v-model="homeEdit.checkin_time"
                         rules="required">
                         <option value="" selected disabled>Select Arrival Time</option>
-                        <option 
-                            v-for="(obj, index) in getTimeSlots" 
+                        <option
+                            v-for="(obj, index) in getTimeSlots"
                             :key="index"
                             :value="obj">
                             {{ obj }}
@@ -264,7 +300,7 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Departure Time<span class="text-danger">*</span></label>
-                    <Field 
+                    <Field
                         as="select"
                         name="departure_time"
                         class="form-control"
@@ -272,8 +308,8 @@
                         v-model="homeEdit.checkout_time"
                         rules="required">
                         <option value="" selected disabled>Select Departure Time</option>
-                        <option 
-                            v-for="(obj, index) in getTimeSlots" 
+                        <option
+                            v-for="(obj, index) in getTimeSlots"
                             :key="index"
                             :value="obj">
                             {{ obj }}
@@ -286,8 +322,8 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Map Latitude</label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="map_latitude"
                         class="form-control"
                         :class="{'border-danger': errors.map_latitude}"
@@ -299,8 +335,8 @@
             <div class="col-12 col-lg-3">
                 <div class="form-group">
                     <label for="">Map Longitude</label>
-                    <Field 
-                        type="text" 
+                    <Field
+                        type="text"
                         name="map_longitude"
                         class="form-control"
                         :class="{'border-danger': errors.map_longitude}"
@@ -312,8 +348,8 @@
             <div class="col-12 col-lg-6">
                 <div class="form-group">
                     <label for="">Google Location URL<span class="text-danger">*</span></label>
-                    <Field 
-                        type="url" 
+                    <Field
+                        type="url"
                         name="googlelocation_url"
                         class="form-control"
                         :class="{'border-danger': errors.googlelocation_url}"
@@ -324,24 +360,64 @@
                     <Tooltip :error="errors.googlelocation_url" />
                 </div>
             </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="form-group">
+                    <label for="">Meta Title</label>
+                    <Field
+                        type="text"
+                        name="meta_title"
+                        class="form-control"
+                         v-model="homeEdit.meta_title"
+                    />
+
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="form-group">
+                    <label for="">Meta Description</label>
+                    <Field
+                        type="url"
+                        name="meta_description"
+                        class="form-control"
+                        v-model="homeEdit.meta_description"
+                    />
+
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="form-group">
+                    <label for="">Meta Keyword</label>
+                    <Field
+                        type="url"
+                        name="meta_keywords"
+                        class="form-control"
+                        v-model="homeEdit.meta_keyword"
+                    />
+
+                </div>
+            </div>
+
             <div class="col-12">
                 <div class="form-group">
                     <label for="">Location Info</label>
                     <ckeditor
-                        name="location_info" 
-                        v-model:data="homeEdit.location_info" 
+                        name="location_info"
+                        v-model:data="homeEdit.location_info"
                     />
                 </div>
-            </div> 
-            
+            </div>
+
             <div class="col-12">
                 <div class="form-group">
                     <label for="">Short Description</label>
-                    <Field 
+                    <Field
                         as="textarea"
                         name="short_description"
                         class="form-control"
-                        rows="7" 
+                        rows="7"
                         v-model="homeEdit.short_description"
                     />
                 </div>
@@ -351,42 +427,42 @@
                 <div class="form-group">
                     <label for="">Description</label>
                     <ckeditor
-                        name="description" 
-                        
-                        v-model:data="homeEdit.description" 
+                        name="description"
+
+                        v-model:data="homeEdit.description"
                     />
                 </div>
-            </div> 
+            </div>
 
             <div class="col-12 col-lg-6">
                 <div class="form-group">
                     <label for="">Directions Short Description<span class="text-danger">*</span></label>
                     <ckeditor
-                        name="short_direction" 
-                        
+                        name="short_direction"
+
                         :rules="homeEdit.short_direction ? '' : 'required'"
-                        v-model:data="homeEdit.short_direction" 
+                        v-model:data="homeEdit.short_direction"
                     />
                 </div>
-            </div> 
+            </div>
 
             <div class="col-12 col-lg-6">
                 <div class="form-group">
                     <label for="">Directions (How to get there)</label>
                     <ckeditor
-                        name="direction_how_to_get_there" 
-                        
-                        v-model:data="homeEdit.direction_how_to_get_there" 
+                        name="direction_how_to_get_there"
+
+                        v-model:data="homeEdit.direction_how_to_get_there"
                     />
                 </div>
-            </div> 
+            </div>
 
             <div class="col-12">
                 <div class="form-group">
                     <label for="">Home Rules</label>
                     <ckeditor
-                        name="house_rules" 
-                        v-model:data="homeEdit.house_rules" 
+                        name="house_rules"
+                        v-model:data="homeEdit.house_rules"
                     />
                 </div>
             </div>
@@ -394,8 +470,8 @@
                 <div class="form-group">
                     <label for="">Cancellation Policy</label>
                     <ckeditor
-                        name="cancellation_policy" 
-                        v-model:data="homeEdit.cancellation_policy" 
+                        name="cancellation_policy"
+                        v-model:data="homeEdit.cancellation_policy"
                     />
                 </div>
             </div>
@@ -403,7 +479,7 @@
             <div class="col-12">
                 <div class="form-group">
                     <label for="">Brochure</label>
-                    <PdfUploadFile 
+                    <PdfUploadFile
                         name="brochure"
                         id="brochure"
                         fileType="pdf"
@@ -468,14 +544,14 @@
 
      const getUploadFile = (value) => {
         uploadFilepdf.value = value
-    } 
+    }
     const deleteUploadFile = (id) => {
         console.log(id,"id")
         axios.get(`/api/pdf-brochure-delete/${id}`).then(res => {
             if(res.data.status){
                 toast(res.data.message, 'success').show()
                 locationEditData.value.image_name = ''
-                locationEditData.value.image = '' 
+                locationEditData.value.image = ''
             }
         }).catch(error => {
             toast(error.response.data.message, 'error').show()
@@ -483,12 +559,12 @@
     }
 
 
-    // For get home type 
+    // For get home type
     const getHomeType = () => {
         axios.get('/api/home-types').then(res => {
             if(res.data.status){
                 homeType.value = res.data.data
-                
+
                 nextTick(() => {
                     vHomeTypeId.value = homeEdit.value.home_type_id
                 })
@@ -499,7 +575,7 @@
     }
 
 
-    // For get state 
+    // For get state
     const getState = () => {
         axios.get('/api/states').then(res => {
             if(res.data.status){
@@ -510,7 +586,7 @@
                         vStateId.value = homeEdit.value.state_id
                         getLocation()
                     }
-                })  
+                })
             }
         }).catch(error => {
             console.log(error);
@@ -518,7 +594,7 @@
     }
 
 
-    // For get state wise location 
+    // For get state wise location
     const getLocation = async () => {
         await nextTick(() => {
             axios.get(`/api/location-by-state/${vStateId.value}`).then(res => {
@@ -532,7 +608,7 @@
             }).catch(error => {
                 console.log(error);
             })
-        }) 
+        })
     }
 
     // const getCollection = async () => {
@@ -549,13 +625,13 @@
     //             })
 
     //                    // vCollectionId.value = homeEdit.value?.homecollections || null;
-                        
+
     //                 })
     //             }
     //         }).catch(error => {
     //             console.log(error);
     //         })
-    //     }) 
+    //     })
     // }
 
     const getCollection = async () => {
@@ -578,7 +654,7 @@
 };
 
 
-    // For get time slots for 24 hour 
+    // For get time slots for 24 hour
     const getTimeSlots = computed(() => {
         let startTime = dayjs().startOf('day').add(0, 'hour')
         let endTime = dayjs().startOf('day').add(24, 'hour')
@@ -591,7 +667,7 @@
 
         return timeSlots
     })
-    
+
 
     // For form on submit
     const onSubmit = (value, {resetForm}) => {
@@ -608,7 +684,7 @@
             brochure: uploadFilepdf.value.filename || '', // Use the file path of the uploaded PDF
             mappedProperties: vCollectionId.value  || '',
         };
- 
+
         axios.post(submitApiUrl.value, payload).then(res => {
             if(res.data.status){
                 toast(res.data.message, 'success').show()
@@ -620,9 +696,9 @@
 
                     if(!route.params.id){
                         router.push({
-                            name: 'add-home', 
-                            params: { 
-                                id: res.data.last_insert_id 
+                            name: 'add-home',
+                            params: {
+                                id: res.data.last_insert_id
                             }
                         })
                     }
@@ -640,6 +716,6 @@
         getState()
         getCollection()
     })
-    
+
 
 </script>

@@ -1,6 +1,14 @@
 
 @extends('layout.main')
 @section('content')
+<style>
+    body, html{
+        overflow-x:hidden !important;
+    }
+    .wrapper{
+        overflow-x:hidden !important;
+    }
+</style>
 <section class="section">
     <div class="container">   
       @foreach ($termandcondition as $termandconditions)

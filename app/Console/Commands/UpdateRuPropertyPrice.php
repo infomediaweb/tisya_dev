@@ -26,50 +26,52 @@ class UpdateRuPropertyPrice extends Command{
     public function handle(){
         set_time_limit(0);
         try {
+            $i = 160;
+            $date_from = date('Y-m-d');
+            $date_to = date('Y-m-d', strtotime($date_from . ' +'.$i.' day'));
             $list = TblHome::whereNotNull('ru_property_id')->get();
+          
             if(!empty($list)){
                 foreach($list as $detail){
-                    for($i=1; $i<=180; $i++){
-                        $price_date = date('Y-m-d', strtotime(date('Y-m-d') . ' +'.$i.' day'));
-                        $xmlReqForPropertyPrice = "<Pull_ListPropertyPrices_RQ>
-                            <Authentication>
-                                <UserName>".config('ru.RU_USER_NAME')."</UserName>
-                                <Password>".config('ru.RU_PASSWORD')."</Password>
-                            </Authentication>
-                            <PropertyID>".$detail->ru_property_id."</PropertyID>
-                            <DateFrom>".$price_date."</DateFrom>
-                            <DateTo>".$price_date."</DateTo>
-                        </Pull_ListPropertyPrices_RQ>";
-                        $ruPropertyPriceResponse = MasterHelper::makeXmlRequest($xmlReqForPropertyPrice);
-
-                        if($ruPropertyPriceResponse){
-                            if(isset($ruPropertyPriceResponse['data']['Prices'])){
-                                if(isset($ruPropertyPriceResponse['data']['Prices']['Season'])){
-                                    if(isset($ruPropertyPriceResponse['data']['Prices']['Season']['Price'])){
-                                        $priceData = array();
-                                        $price = RuPropertyPrice::where(['ru_property_id' =>  $detail->ru_property_id, 'price_date' => $price_date])->first();
-                                        $priceData['price'] = $ruPropertyPriceResponse['data']['Prices']['Season']['Price'];
-                                        $priceData['extra_price'] = $ruPropertyPriceResponse['data']['Prices']['Season']['Extra'];
-                                        $priceData['price_date'] = $price_date;
-                                        $priceData['ru_property_id'] = $detail->ru_property_id;
-                                        if(!empty($price)){
-                                            RuPropertyPrice::where(['ru_property_id' =>  $detail->ru_property_id, 'price_date' => $price_date])->update($priceData);
-                                        }
-                                        else{
-                                            RuPropertyPrice::create($priceData);
-                                        }
-
+                    $xmlReqForPropertyPrice = "<Pull_ListPropertyPrices_RQ>
+                        <Authentication>
+                            <UserName>".config('ru.RU_USER_NAME')."</UserName>
+                            <Password>".config('ru.RU_PASSWORD')."</Password>
+                        </Authentication>
+                        <PropertyID>".$detail->ru_property_id."</PropertyID>
+                        <DateFrom>".$date_from."</DateFrom>
+                        <DateTo>".$date_to."</DateTo>
+                    </Pull_ListPropertyPrices_RQ>";
+                    $ruPropertyPriceResponse = MasterHelper::makeXmlRequest($xmlReqForPropertyPrice);
+                 
+                    if($ruPropertyPriceResponse){
+                        if(isset($ruPropertyPriceResponse['data']['Prices'])){
+                            if(isset($ruPropertyPriceResponse['data']['Prices']['Season'])){
+                                foreach($ruPropertyPriceResponse['data']['Prices']['Season'] as $session){
+                                    $priceArray = array();
+                                    $priceArray['price_date'] = $session['@attributes']['DateFrom'];
+                                    $priceArray['ru_property_id'] = $detail->ru_property_id;
+                                    $priceArray['price'] = $session['Price'];
+                                    $priceArray['extra_price'] = $session['Extra'];
+                                    $count = RuPropertyPrice::where(['price_date'=>$session['@attributes']['DateFrom'], 'ru_property_id'=> $detail->ru_property_id])->count();
+                                    if($count ==0){
+                                        RuPropertyPrice::create($priceArray);
+                                    }
+                                    else{
+                                        RuPropertyPrice::where(['price_date'=>$session['@attributes']['DateFrom'], 'ru_property_id'=> $detail->ru_property_id])->update(['price'=>$session['Price']]);
                                     }
                                 }
                             }
                         }
                     }
+                   
                 }
+                echo 'Done';
             }
-            echo 'Done';
         }
         catch (\Exception $e) {
             dd($e->getMessage());
         }
+
     }
 }

@@ -19,8 +19,7 @@ class BookingCancellationEmail extends Mailable{
      * Create a new message instance.
      */
     public function __construct($mailData){
-        $this->mailData = $mailData['bookingDetail'];
-        $this->id = $mailData['id'];
+        $this->mailData = $mailData['mailData'];
     }
 
     /**
@@ -28,7 +27,7 @@ class BookingCancellationEmail extends Mailable{
      */
     public function envelope(): Envelope{
         return new Envelope(
-            subject: 'Your Booking Is Cancelled[Your Booking Refrence Number Is- '.$this->mailData->booking_id.']',
+            subject: 'Booking Cancellation From Tisyastays[Your Booking Refrence Number Is- '.$this->mailData->booking_id.']',
         );
     }
 

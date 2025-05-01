@@ -1,21 +1,18 @@
-@php
 
-
-@endphp
 
 <aside class="col-12 col-xl-auto align-self-start">
     <div class="card filter-card" id="sidebar">
-        <div class="card-header py-3"><i class="icon-filter"></i>Filters <span role="button" class="d-lg-none ms-auto close-btn lh-1 fs-3 fw-light ps-3">&times;</span></div>
+        <div class="card-header py-3"><i class="icon-filter"></i>Filters <span role="button" class="d-lg-none ms-auto close-btn lh-1 fs-3">&times;</span></div>
         <div class="card-header bg-primary text-white py-3 "><span class="mlocation">
             @if($filter_type == 'location' && !empty($location_name))
             {{ $location_name ?? '' }}
         @endif
         
         </span></div>
-        <div class="card-body p-0">
-            <div class="nano filter-content-wrap">
-                <div class="nano-content">
-                    <div class="filter-box fb-price">
+        <div class="card-body p-0" style="overflow-x:hidden!important">
+            <div class="nano filter-content-wrap" style="overflow-x:hidden!important">
+                <div class="nano-content" style="overflow-x:hidden!important">
+                    <div class="filter-box fb-price" style="overflow-x:hidden!important">
                         <h3>Price Range</h3>
                         <div class="price-range">
                             <div class="range-outer mt-3">
@@ -38,7 +35,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="filter-box fb-rooms">
+                    <div class="filter-box fb-rooms" style="overflow-x:hidden!important">
                         <h3>Rooms</h3>
                         <div class="row gx-2 align-items-center">
                             <div class="col">
@@ -57,7 +54,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="filter-box fb-nav">
+                    <div class="filter-box fb-nav" style="overflow-x:hidden!important">
                         <h3>Property Type</h3>
                         <ul class="nav-list list-unstyled mb-0">
                             <li>
@@ -79,7 +76,7 @@
                         </ul>
                     </div>
 
-                    <div class="filter-box fb-nav">
+                    <div class="filter-box fb-nav" style="overflow-x:hidden!important">
                         <h3>Location</h3>
                         <ul class="nav-list list-unstyled mb-0">
                             <li>
@@ -101,7 +98,7 @@
                         </ul>
                     </div>
                     
-                    <div class="filter-box fb-nav">
+                    <div class="filter-box fb-nav" style="overflow-x:hidden!important">
                         <h3>Top Filters</h3>
                         <ul class="nav-list list-unstyled mb-0">
                             @foreach(App\Models\TblAmenities::where('show_on_filter', 1)->where('status', 1)->get() as $tagKey => $tagDetail)
@@ -295,6 +292,8 @@ function fetchProperties(queryString, append = false) {
             );
 
             if(data.total == data.propertyCount){
+                ScrollTrigger.clearMatchMedia();
+                ScrollTrigger.refresh();
                 $(".loadPaginationP").hide(); 
             }else{
                 if (data.nextPage) {
@@ -311,7 +310,10 @@ function fetchProperties(queryString, append = false) {
             `);
             } 
             }
-            
+           ScrollTrigger.clearMatchMedia();
+          ScrollTrigger.refresh();
+          //  hardRefresh();
+            //reinitializeScripts()
             new Swiper('.swiper-property-image', {
             spaceBetween: 30,
             pagination: {
@@ -328,6 +330,8 @@ function fetchProperties(queryString, append = false) {
                 forceToAxis: true
             },
         });
+        
+        
 
         ScrollTrigger.matchMedia({
             "(min-width: 1300px)": function () {
@@ -347,6 +351,16 @@ function fetchProperties(queryString, append = false) {
                 $(".nano").nanoScroller({ destroy: true });
             }
         })
+
+        $(document).on("click",'.mch-filter', function(){
+            $('body').addClass('mch-filter-open');
+        })
+
+        $(document).on("click",'.filter-card .close-btn', function(){
+            $('body').removeClass('mch-filter-open');
+        })
+    
+    
         } else {
             console.error("Invalid response format", data);
             $('.items').html("<p class='text-center'>No properties found.</p>"); 
@@ -437,6 +451,12 @@ function updateFilters() {
         fetchProperties(newParams.toString());
     }
 
-    
+    function hardRefresh() {
+    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    ScrollTrigger.clearMatchMedia();
+    ScrollTrigger.refresh();
+}
+
+
 
 </script>

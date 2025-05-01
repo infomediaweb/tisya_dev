@@ -1,7 +1,7 @@
 
     <div class="properties-listing">
         @foreach($properties as $property)
-            <div class="property-item">
+            <div class="property-item" >
                 <div class="row">
                     <div class="col-12 col-lg-5 position-relative col-xxl-4">
                         <a href="{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key,
@@ -47,7 +47,8 @@
                             </a>
                         @endif
                     </div>
-                    <div class="col-12 col-lg align-self-center py-3">
+                    <div class="col-12 col-lg align-self-center py-3" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key, 'location_name' => $location_name, 'checkin_date' => $checkin_date, 'checkout_date' => $checkout_date, 'city_id' => $city_id, 'total_guests' => $total_guests, 'adultsCount' => $adultsCount, 'childrenCount' => $childrenCount, 'guestCount' => $guestCount]) }}', '_blank');" 
+                style="cursor: pointer;">
                         <h2>{{ $property->home_name }}</h2>
                         <div class="location-state">
                                     {{$property->locationData->location_name ?? '' }}, {{ $property->state }}
@@ -75,7 +76,8 @@
                             </div>
                         @endif
                     </div>
-                    <div class="col-12 col-lg-auto">
+                    <div class="col-12 col-lg-auto" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key, 'location_name' => $location_name, 'checkin_date' => $checkin_date, 'checkout_date' => $checkout_date, 'city_id' => $city_id, 'total_guests' => $total_guests, 'adultsCount' => $adultsCount, 'childrenCount' => $childrenCount, 'guestCount' => $guestCount]) }}', '_blank');" 
+                style="cursor: pointer;">
                         <div class="card price-card h-100">
                             <div class="card-body">
                                 <h3>From ₹{{ number_format($property->pl_price) }}</h3>
@@ -91,7 +93,7 @@
                                 'adultsCount' => $adultsCount, 
                                 'childrenCount' => $childrenCount, 
                                 'guestCount' => $guestCount, 
-                                ]) }}" target="_blank" class="btn btn-primary">View Detail</a>
+                                ]) }}" target="_blank" class="btn btn-primary">View Details</a>
                             </div>
                         </div>
                     </div>

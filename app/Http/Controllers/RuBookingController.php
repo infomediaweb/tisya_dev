@@ -25,7 +25,15 @@ class RuBookingController extends Controller{
     //---------------- This method use for registring the webhook url------//
     //---- URL for webhook registration -> https://varefamily.iws.in/ru/set/booking/webhook  ----//
     public function setBookingHandlerAPi(){
-       
+        $reqXml = "<LNM_PutHandlerUrl_RQ>
+                    <Authentication>
+                        <UserName>".config('ru.RU_USER_NAME')."</UserName>
+                        <Password>".config('ru.RU_PASSWORD')."</Password>
+                    </Authentication>
+                    <HandlerUrl>https://www.tisyastays.com/api/ru/webhook/get/bookings</HandlerUrl>
+                </LNM_PutHandlerUrl_RQ>";
+        $xmlResponse = MasterHelper::makeXmlRequest($reqXml);
+        dd($xmlResponse);
     }
 
 
@@ -42,7 +50,7 @@ class RuBookingController extends Controller{
             if(isset($result_array['Reservation']['ReservationStatusID'])){
                 if($result_array['Reservation']['ReservationStatusID'] =='1' || $result_array['Reservation']['ReservationStatusID'] =='3'){
                     $propertyBooking = array();
-                    if($result_array['Reservation']['Creator']=='gagan@tisyastays.com'){
+                    if($result_array['Reservation']['Creator'] =='gagan@tisyastays.com'){
                         $stayInfo =  $result_array['Reservation']['StayInfos']['StayInfo'];
                         $customerInfo =  $result_array['Reservation']['CustomerInfo'];
 
@@ -173,6 +181,7 @@ class RuBookingController extends Controller{
                     }
 
                     $propertyBooking['property_booking_status'] = 'Confirmed';
+                    $propertyBooking['payment_status'] = 'Paid';
 
                     $count = PropertyBooking::where('booking_id', $result_array['Reservation']['ReservationID'])->count();
                     if($count == 0){
@@ -193,7 +202,7 @@ class RuBookingController extends Controller{
             $home  = TblHome::where('id', $bookingDetail->property_id)->first();
             RuPropertyAvailability::where('ru_property_id', $home->ru_property_id)->whereBetween('availability_date', [date('Y-m-d', strtotime($bookingDetail->checkin_date)), date('Y-m-d', strtotime($bookingDetail->checkout_date))])->update(['is_available'=>'yes']);
 
-            PropertyBooking::where('booking_id', $result_array['ReservationID'])->update(['ru_booking_status'=>'Canceled']);
+            PropertyBooking::where('booking_id', $result_array['ReservationID'])->update(['ru_booking_status'=>'Canceled', 'property_booking_status'=>'Canceled']);
         }
        
     }

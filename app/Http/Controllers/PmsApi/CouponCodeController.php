@@ -88,28 +88,79 @@ class CouponCodeController extends Controller{
     /**
      * Display a listing of the resource.
      */
+    // public function getPropertyListByPropertyTypes(Request $request){
+    //     try {
+    //         $query = TblHome::query();
+    //         $ids = $request->get('ids');
+    //         $query->when($ids != "[]", function ($q) use ($ids) {
+    //             return $q->whereIn('id', json_decode($ids));
+    //         });
+    //         $list = $query->whereNotNull('ru_property_id')->get();
+    //         return response([
+    //             'status' => true,
+    //             'message' => 'Listed Successfully',
+    //             'data' => $list
+    //         ], 200);
+    //     }
+    //     catch (\Exception $e) {
+    //         //dd($e);
+    //         return response([
+    //             'status' => false,
+    //             'message' => 'Error!, please try again later.'
+    //         ], 400);
+    //     }
+    // }
+    
+    
     public function getPropertyListByPropertyTypes(Request $request){
+
         try {
+
             $query = TblHome::query();
+
             $ids = $request->get('ids');
-            $query->when($ids != "[]", function ($q) use ($ids) {
-                return $q->whereIn('id', json_decode($ids));
+
+
+
+            $query->when($ids != "[]" && $ids !="null", function ($q) use ($ids) {
+
+                return $q->whereIn('home_type_id', json_decode($ids));
+
             });
+
             $list = $query->whereNotNull('ru_property_id')->get();
+
+
+
             return response([
+
                 'status' => true,
+
                 'message' => 'Listed Successfully',
+
                 'data' => $list
+
             ], 200);
+
         }
+
         catch (\Exception $e) {
+
             //dd($e);
+
             return response([
+
                 'status' => false,
+
                 'message' => 'Error!, please try again later.'
+
             ], 400);
+
         }
+
     }
+    
+    
 
     /**
      * Display the all resource.
@@ -463,32 +514,62 @@ class CouponCodeController extends Controller{
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request){
-        //
-        try {
-            $data = DiscountCoupon::findOrFail($request->get('id'));
-            if ($data) {
+    // public function destroy(Request $request){
+        
+    //     try {
+    //         $data = DiscountCoupon::findOrFail($request->get('id'));
+    //         if ($data) {
+    //             $data->delete();
+    //             return response()->json([
+    //                 'status' => true,
+    //                 'message' => 'Successfully Deleted.'
+    //             ], 200);
+    //         }
+    //         else {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'No record found'
+    //             ], 200);
+    //         }
+    //     }
+    //     catch (\Exception $e) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Internal Error',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+        public function destroy(Request $request, $id)
+        {
+            try {
+                // Find the coupon by ID first
+                $data = DiscountCoupon::findOrFail($id); // findOrFail will throw an exception if not found
+        
+                // Delete the coupon
                 $data->delete();
+        
+                // Delete related coupon code mappings
+                DiscountCouponCodeMapping::where('discount_coupon_id', $id)->delete();
+        
+                // Return success response
                 return response()->json([
                     'status' => true,
                     'message' => 'Successfully Deleted.'
                 ], 200);
             }
-            else {
+            catch (\Exception $e) {
+                // Return error response with exception message
                 return response()->json([
                     'status' => false,
-                    'message' => 'No record found'
-                ], 200);
+                    'message' => 'Internal Error',
+                    'error' => $e->getMessage()
+                ], 500);
             }
         }
-        catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Internal Error',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+
+
 
     public function deleteMultipleRecord(Request $request){
         //

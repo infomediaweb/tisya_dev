@@ -77,6 +77,7 @@
                                             <option value="Booking.com">Booking.com</option>
                                             <option value="MakeMyTrip">MakeMyTrip</option>
                                             <option value="PMS">PMS</option>
+                                            <option value="Website">Website</option>
                                         </Field>
                                     </div>
                                 </div>
@@ -91,7 +92,7 @@
                                             <option value="" selected disabled>Payment Status</option>
                                             <option value="Confirmed">Confirmed</option>
                                             <option value="Canceled">Canceled</option>
-                                            
+
                                         </Field>
                                     </div>
                                 </div>

@@ -13,7 +13,7 @@
                                 type="text" 
                                 class="form-control form-control-sm" 
                                 v-model="vSearchQuery"
-                                placeholder="Search by name, location, state"
+                                placeholder="Search by name,Internal name, location, state"
                             >
                         </div>
                     </form>
@@ -48,7 +48,10 @@
                                             >
                                         </th>
                                         <th style="width:90px;" class="fw-semibold">Image</th>
-                                        <th class="text-secondary fw-semibold" style="width: 25%;">Name</th>
+                                        <th class="text-secondary fw-semibold" style="width: 20%;">Name</th>
+                                        <th class="text-secondary fw-semibold">Internal name</th>
+                                        <th class="text-secondary fw-semibold">Ru ID</th>
+                                        <th class="text-secondary fw-semibold">Hyper Guest ID</th>
                                         <th class="text-secondary fw-semibold">Location</th>
                                         <th class="text-secondary fw-semibold">State</th>
                                         <th class="fw-semibold">Only For Enquiry</th>
@@ -82,6 +85,9 @@
                                                 </p>
                                             </div>
                                         </td>
+                                        <td>{{ obj.internal_name }}</td>
+                                        <td>{{ obj.ru_property_id }}</td>
+                                        <td>{{ obj.hyper_guest_id }}</td>
                                         <td>{{ obj.location }}</td>
                                         <td>{{ obj.state }}</td>
                                         <td>

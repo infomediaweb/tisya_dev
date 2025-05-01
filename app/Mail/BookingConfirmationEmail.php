@@ -20,8 +20,8 @@ class BookingConfirmationEmail extends Mailable{
      * Create a new message instance.
      */
     public function __construct($mailData){
-        $this->mailData = $mailData['mailData'];
-        $this->id = $this->mailData->id;
+        $this->mailData = $mailData['bookingDetail'];
+        $this->id = $mailData['id'];
     }
 
     /**
@@ -35,7 +35,7 @@ class BookingConfirmationEmail extends Mailable{
         }
         else{
             return new Envelope(
-                subject: 'Booking Confirmed[Your Booking Refrence Number Is- '.$this->mailData->booking_id.']',
+                subject: 'Booking Confirmation From Tisya Stays[Your Booking Refrence Number Is- '.$this->mailData->booking_id.']',
             );
         }
     }

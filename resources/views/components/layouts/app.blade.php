@@ -27,7 +27,7 @@
     $body_class = ($pagename == 'index') ? 'home-page' : 'inner-page';
     $body_class .= ($pagename == 'property-details') ? ' details' : '';
 ?>
-<body class="{{ $body_class }} {{ request()->routeIs('property-details') ? 'details' : '' }}">
+<body class="{{ $body_class }} {{ request()->routeIs('property-details') ? 'details' : '' }} {{ request()->routeIs('property-detail') ? 'wh-icon-detail' : '' }}">
 
      <div class="wrapper">
             <main class="main">

@@ -5,9 +5,8 @@ import cookies from 'vue-cookies'
 import { ref } from 'vue'
 import { toast } from '@utils/toast'
 
-
-axios.defaults.baseURL = "https://tisya.tempsite.in/"
-
+axios.defaults.baseURL = 'https://www.tisyastays.com/';
+//axios.defaults.baseURL = 'https://tisya.tempsite.in/';
 axios.interceptors.request.use(function (config) {
     if(store.getters.user?.token){
         config.headers['Authorization'] = 'Bearer ' + store.getters.user?.token
@@ -20,7 +19,7 @@ axios.interceptors.request.use(function (config) {
 axios.interceptors.response.use(function (response) {
     return response
 }, function (error) {
-    if (error.response.status === 401) { 
+    if (error.response.status === 401) {
         store.dispatch('user', '')
         router.push({name: 'login'})
     }
@@ -28,7 +27,7 @@ axios.interceptors.response.use(function (response) {
 })
 
 
-// For session expired 
+// For session expired
 const events = ref(['click', 'mousemove', 'mousedown', 'touchmove', 'scroll', 'keypress', 'load'])
 const sessionTimer = ref(null)
 
@@ -42,7 +41,7 @@ const sessionExpired = () => {
         router.push({name: 'login'})
 
         toast('Oops! your session has expired. Please log in again to continue.', 'error').show()
-    } 
+    }
 }
 
 const resetSessionTimer = () => {

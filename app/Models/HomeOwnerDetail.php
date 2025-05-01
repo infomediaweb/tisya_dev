@@ -16,6 +16,7 @@ class HomeOwnerDetail extends Model{
         'user_name',
         'password',
         'status',
-        'home_id'
+        'home_id',
+      
     ];
 }

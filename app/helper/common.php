@@ -8,6 +8,7 @@ use App\Models\RuPropertyPrice;
 use App\Models\TblHome;
 use App\Models\TblState;
 use App\Http\Controllers\MinStayController;
+use Illuminate\Support\Facades\Http;
 
 function getLocationList(){
     return TblLocation::where('status', 1)->get()->toArray();
@@ -95,7 +96,23 @@ function blockPropertyAvailabilityInRu($ru_id, $checkin_date, $checkout_date){
         $checkoutDate = $ck;
     }
     
+     
     RuPropertyAvailability::where('ru_property_id', $ru_id)->whereBetween('availability_date', [$checkin_date, $checkoutDate])->update(['is_available'=>'no']);
+
+    $xml = "<Push_PutAvbUnits_RQ>
+                <Authentication>
+                    <UserName>".config('ru.RU_USER_NAME')."</UserName>
+                    <Password>".config('ru.RU_PASSWORD')."</Password>
+                </Authentication>
+                <MuCalendar PropertyID='".$ru_id."'>
+                    <Date From='".date('Y-m-d', strtotime($checkin_date))."' To='".date('Y-m-d', strtotime($checkoutDate))."'>
+                        <U>0</U>
+                        <C>4</C>
+                    </Date>
+                </MuCalendar>
+            </Push_PutAvbUnits_RQ>";
+    $xmlResponse = MasterHelper::makeXmlRequest($xml);
+    return $xmlResponse;
 }
 
 function unBlockPropertyAvailabilityInRu($ru_id, $checkin_date, $checkout_date){
@@ -109,20 +126,20 @@ function unBlockPropertyAvailabilityInRu($ru_id, $checkin_date, $checkout_date){
         $checkoutDate = $ck;
     }
     RuPropertyAvailability::where('ru_property_id', $ru_id)->whereBetween('availability_date', [$checkin_date, $checkoutDate])->update(['is_available'=>'yes']);
-    //   $xml = "<Push_PutAvbUnits_RQ>
-    //             <Authentication>
-    //                 <UserName>".config('ru.RU_USER_NAME')."</UserName>
-    //                 <Password>".config('ru.RU_PASSWORD')."</Password>
-    //             </Authentication>
-    //             <MuCalendar PropertyID='".$ru_id."'>
-    //                 <Date From='".date('Y-m-d', strtotime($checkin_date))."' To='".date('Y-m-d', strtotime($checkoutDate))."'>
-    //                     <U>1</U>
-    //                     <C>4</C>
-    //                 </Date>
-    //             </MuCalendar>
-    //         </Push_PutAvbUnits_RQ>";
-    // $xmlResponse = MasterHelper::makeXmlRequest($xml);
-    // return $xmlResponse;
+      $xml = "<Push_PutAvbUnits_RQ>
+                <Authentication>
+                    <UserName>".config('ru.RU_USER_NAME')."</UserName>
+                    <Password>".config('ru.RU_PASSWORD')."</Password>
+                </Authentication>
+                <MuCalendar PropertyID='".$ru_id."'>
+                    <Date From='".date('Y-m-d', strtotime($checkin_date))."' To='".date('Y-m-d', strtotime($checkout_date))."'>
+                        <U>1</U>
+                        <C>4</C>
+                    </Date>
+                </MuCalendar>
+            </Push_PutAvbUnits_RQ>";
+    $xmlResponse = MasterHelper::makeXmlRequest($xml);
+    return $xmlResponse;
 }
 
 
@@ -168,12 +185,16 @@ function propertyListByBasedLocation($ids, $guests){
             $property->per_night_price =  $per_night_price;
             array_push($finalArray, $property);
         }
+        
+        
     }
     return $finalArray;
 }
 
 
 function propertyList($search_parameters){
+    
+    
     try {
         $no_of_guests = $search_parameters['guest_count'];
         $last_date =  date('Y-m-d', strtotime($search_parameters['departureDate']. '-1 days'));
@@ -194,108 +215,6 @@ function propertyList($search_parameters){
         $query = TblHome::query();
         $query->when($location_id != '', function ($q) use ($location_id) {
             return $q->where('location_id', $location_id);
-        });
-        $query->when($no_of_guests != 0, function ($q) use ($no_of_guests) {
-            return $q->where('maximum_number_of_guests', '>=', $no_of_guests);
-        });
-        $list = $query->with(['additionalCharge', 'images'])->whereNotNull('ru_property_id')->get();
-        
-        $filtered_property_list = array();
-        if(!empty($list)){
-            foreach($list as $detail){
-                $count = DB::table('ru_property_availabilities')->where('ru_property_id', $detail->ru_property_id)->where('availability_date', '>=', $checkin_date)->where('availability_date', '<=', $search_parameters['departureDate'])->where('is_available', 'no')->count();
-              
-                $minStayController = new MinStayController();
-                $minStay =  $minStayController->syncMinStay($checkin_date, $detail->id); 
-                //$minStay =  1; 
-                if($count ==0 ){
-                    $price = 0;
-                    $price = $initial_price = 0;
-
-                    $price = RuPropertyPrice::where('ru_property_id', $detail->ru_property_id)->whereBetween('price_date', [$checkin_date, $last_date])->sum('price');
-                    if($price >0  && (integer)$date_difference_count >= (integer)$minStay ){
-                        $gst_amount = 0;
-                        $gstPrecentage = 0;
-
-                        $detail->price = $price;
-                        $per_night_price = $price/$date_difference_count;
-                        if(setting()->website_markup){
-                        
-                            $per_night_price = $per_night_price +  ($per_night_price*setting()->website_markup)/100;
-                        }
-                        $detail->per_night_price = round($per_night_price);
-                        $detail->per_room_price = $per_night_price/$detail->no_of_bedrooms;
-                        $detail->initial_price = $price;
-                        $detail->gst_amount = $gst_amount;
-                        $detail->gst_percentage = $gstPrecentage;
-                        $detail->noOfNights = $date_difference_count;
-                     
-                        $getAppliedGst  = getAppliedGst($price);
-                        if($getAppliedGst){
-                            $precentageAmount = ($price*$getAppliedGst->gst_percentage)/100;
-                            $gst_amount = $precentageAmount;
-                            $gstPrecentage = $getAppliedGst->gst_percentage;
-                        }
-
-                        $extra_no_of_guest = 0;
-                        $extra_guest_charge = 0;
-
-                       
-
-                        if($no_of_guests >$detail->guests_included && $no_of_guests <= $detail->maximum_number_of_guests){
-                            if($detail->maximum_number_of_guests == $no_of_guests){
-                                $extra_no_of_guest = $detail->maximum_number_of_guests - $detail->guests_included;
-                            }
-                            else if($no_of_guests == $detail->maximum_number_of_guests){
-                                $extra_no_of_guest = 1;
-                            }
-                            else{
-                                $extra_no_of_guest = $detail->maximum_number_of_guests - $no_of_guests;
-                            }
-                            $extra_guest_charge = $extra_no_of_guest*$detail->extra_guest_charges;
-                            $getAppliedGeusetChargeGst  = getAppliedGst($extra_guest_charge);
-                            if($getAppliedGst){
-                                $precentageExtraGuestChargeAmount = ($extra_guest_charge*$getAppliedGst->gst_percentage)/100;
-                                $extra_guest_charge = $precentageExtraGuestChargeAmount + $extra_guest_charge;
-                            }
-                        }
-                        $detail->extra_no_of_guest = $extra_no_of_guest;
-                        $detail->final_extra_guest_charge = $extra_guest_charge;
-                        array_push($filtered_property_list, $detail);
-                    }
-                }
-            }
-        }
-     
-        return $filtered_property_list;
-    }
-    catch (\Exception $e) {
-        return $e->getMessage();
-    }
-}
-
-
-function propertyListByState($search_parameters){
-    try {
-        $no_of_guests = $search_parameters['guest_count'];
-        $last_date =  date('Y-m-d', strtotime($search_parameters['departureDate']. '-1 days'));
-        $checkin_date =  $search_parameters['arrivalDate'];
-        if($last_date == $search_parameters['arrivalDate']){
-            $date_difference_count = 1;
-        }
-        else{
-            $date_difference_count = MasterHelper::getDateDifference($search_parameters['arrivalDate'], $search_parameters['departureDate']);
-        }
-        if($date_difference_count > 1){
-            $date_difference_count = $date_difference_count;
-        }
-        else{
-            $date_difference_count = 1;
-        }
-        $location_id = $search_parameters['locations'];
-        $query = TblHome::query();
-        $query->when($location_id != '', function ($q) use ($location_id) {
-            return $q->whereIn('location_id', $location_id);
         });
         $query->when($no_of_guests != 0, function ($q) use ($no_of_guests) {
             return $q->where('maximum_number_of_guests', '>=', $no_of_guests);
@@ -470,6 +389,7 @@ function propertyListByLocation($ids, $guests){
     return $finalArray;
 }
 
+
 function propertyListByLocationFilter($ids, $guests,$min_price = null, $max_price = null){
     $query = TblHome::query();
     $query->whereIn('tbl_homes.id', $ids);
@@ -534,5 +454,185 @@ function propertyListByLocationFilter($ids, $guests,$min_price = null, $max_pric
 
 function reservationXmlRequest($booking){
     
-   
+    $price = 0;
+    $xmlReqForPropertyPrice =
+        "<Pull_ListPropertyPrices_RQ>
+        <Authentication>
+        <UserName>" .
+        config("ru.RU_USER_NAME") .
+        "</UserName>
+        <Password>" .
+                config("ru.RU_PASSWORD") .
+        "</Password>
+        </Authentication>
+        <PropertyID>" .
+        $booking->property->ru_property_id .
+        "</PropertyID>
+         <DateFrom>".date('Y-m-d', strtotime($booking->checkin_date))."</DateFrom>
+                        <DateTo>".date('Y-m-d', strtotime($booking->checkout_date.' -1 day'))."</DateTo>
+    </Pull_ListPropertyPrices_RQ>";
+
+
+    $ruPropertyPriceResponse = MasterHelper::makeXmlRequest(
+        $xmlReqForPropertyPrice
+    );
+    
+
+    $priceListDateWise = $ruPropertyPriceResponse["data"]["Prices"]["Season"];
+    
+    if(isset($priceListDateWise['Price'])){
+        $price = $priceListDateWise['Price'];
+    }
+    else{
+        foreach ($priceListDateWise as $key => $value) {
+            $price = $price + $value["Price"];
+        } 
+    }
+    $total_price = $price;
+    $req='<Push_PutConfirmedReservationMulti_RQ>
+            <Authentication>
+                <UserName>'.config('ru.RU_USER_NAME').'</UserName>
+                <Password>'.config('ru.RU_PASSWORD').'</Password>
+            </Authentication>
+            <Reservation>
+                <StayInfos>
+                    <StayInfo>
+                        <PropertyID>'.$booking->property->ru_property_id.'</PropertyID>
+                        <DateFrom>'.date('Y-m-d', strtotime($booking->checkin_date)).'</DateFrom>
+                        <DateTo>'.date('Y-m-d', strtotime($booking->checkout_date)).'</DateTo>
+                        <NumberOfGuests>'.$booking->no_of_adult.'</NumberOfGuests>
+                        <Costs>
+                            <RUPrice>'.round($total_price).'</RUPrice>
+                            <ClientPrice>'.$booking->payable_amount.'</ClientPrice>
+                            <AlreadyPaid>'.$booking->payable_amount.'</AlreadyPaid>
+                            <ChannelCommission>0.00</ChannelCommission>
+                        </Costs>
+                    </StayInfo>
+                </StayInfos>
+                <CancellationPolicyInfo>
+                    <PolicyText>Cancellation Policy</PolicyText>
+                    <CancellationPolicies>
+                        <CancellationPolicy ValidFrom="0" ValidTo="3">100</CancellationPolicy>
+                        <CancellationPolicy ValidFrom="4" ValidTo="10">50</CancellationPolicy>
+                    </CancellationPolicies>
+                </CancellationPolicyInfo>
+                <CustomerInfo>
+                    <Name>'.$booking->customer_detail['first_name'].'</Name>
+                    <SurName>'.$booking->customer_detail['last_name'].'</SurName>
+                    <Email>'.$booking->customer_detail['email'].'</Email>
+                    <Phone>'.$booking->customer_detail['mobile_number'].'</Phone>
+                    <CountryID>42</CountryID>
+                </CustomerInfo>
+                <GuestDetailsInfo>
+                    <NumberOfAdults>'.$booking->no_of_adult.'</NumberOfAdults>
+                    <NumberOfChildren>0</NumberOfChildren>
+                    <NumberOfInfants>0</NumberOfInfants>
+                    <NumberOfPets>0</NumberOfPets>
+                </GuestDetailsInfo>
+                <Comments>Booking from nook and co website</Comments>
+            </Reservation>
+        </Push_PutConfirmedReservationMulti_RQ>';
+    return $req;
+}
+
+
+function propertyListByState($search_parameters){
+    try {
+        $no_of_guests = $search_parameters['guest_count'];
+        $last_date =  date('Y-m-d', strtotime($search_parameters['departureDate']. '-1 days'));
+        $checkin_date =  $search_parameters['arrivalDate'];
+        if($last_date == $search_parameters['arrivalDate']){
+            $date_difference_count = 1;
+        }
+        else{
+            $date_difference_count = MasterHelper::getDateDifference($search_parameters['arrivalDate'], $search_parameters['departureDate']);
+        }
+        if($date_difference_count > 1){
+            $date_difference_count = $date_difference_count;
+        }
+        else{
+            $date_difference_count = 1;
+        }
+        $location_id = $search_parameters['locations'];
+        $query = TblHome::query();
+        $query->when($location_id != '', function ($q) use ($location_id) {
+            return $q->whereIn('location_id', $location_id);
+        });
+        $query->when($no_of_guests != 0, function ($q) use ($no_of_guests) {
+            return $q->where('maximum_number_of_guests', '>=', $no_of_guests);
+        });
+        $list = $query->with(['additionalCharge', 'images'])->whereNotNull('ru_property_id')->get();
+        
+        $filtered_property_list = array();
+        if(!empty($list)){
+            foreach($list as $detail){
+                $count = DB::table('ru_property_availabilities')->where('ru_property_id', $detail->ru_property_id)->where('availability_date', '>=', $checkin_date)->where('availability_date', '<=', $search_parameters['departureDate'])->where('is_available', 'no')->count();
+              
+                $minStayController = new MinStayController();
+                $minStay =  $minStayController->syncMinStay($checkin_date, $detail->id); 
+                //$minStay =  1; 
+                if($count ==0 ){
+                    $price = 0;
+                    $price = $initial_price = 0;
+
+                    $price = RuPropertyPrice::where('ru_property_id', $detail->ru_property_id)->whereBetween('price_date', [$checkin_date, $last_date])->sum('price');
+                    if($price >0  && (integer)$date_difference_count >= (integer)$minStay ){
+                        $gst_amount = 0;
+                        $gstPrecentage = 0;
+
+                        $detail->price = $price;
+                        $per_night_price = $price/$date_difference_count;
+                        if(setting()->website_markup){
+                        
+                            $per_night_price = $per_night_price +  ($per_night_price*setting()->website_markup)/100;
+                        }
+                        $detail->per_night_price = round($per_night_price);
+                        $detail->per_room_price = $per_night_price/$detail->no_of_bedrooms;
+                        $detail->initial_price = $price;
+                        $detail->gst_amount = $gst_amount;
+                        $detail->gst_percentage = $gstPrecentage;
+                        $detail->noOfNights = $date_difference_count;
+                     
+                        $getAppliedGst  = getAppliedGst($price);
+                        if($getAppliedGst){
+                            $precentageAmount = ($price*$getAppliedGst->gst_percentage)/100;
+                            $gst_amount = $precentageAmount;
+                            $gstPrecentage = $getAppliedGst->gst_percentage;
+                        }
+
+                        $extra_no_of_guest = 0;
+                        $extra_guest_charge = 0;
+
+                       
+
+                        if($no_of_guests >$detail->guests_included && $no_of_guests <= $detail->maximum_number_of_guests){
+                            if($detail->maximum_number_of_guests == $no_of_guests){
+                                $extra_no_of_guest = $detail->maximum_number_of_guests - $detail->guests_included;
+                            }
+                            else if($no_of_guests == $detail->maximum_number_of_guests){
+                                $extra_no_of_guest = 1;
+                            }
+                            else{
+                                $extra_no_of_guest = $detail->maximum_number_of_guests - $no_of_guests;
+                            }
+                            $extra_guest_charge = $extra_no_of_guest*$detail->extra_guest_charges;
+                            $getAppliedGeusetChargeGst  = getAppliedGst($extra_guest_charge);
+                            if($getAppliedGst){
+                                $precentageExtraGuestChargeAmount = ($extra_guest_charge*$getAppliedGst->gst_percentage)/100;
+                                $extra_guest_charge = $precentageExtraGuestChargeAmount + $extra_guest_charge;
+                            }
+                        }
+                        $detail->extra_no_of_guest = $extra_no_of_guest;
+                        $detail->final_extra_guest_charge = $extra_guest_charge;
+                        array_push($filtered_property_list, $detail);
+                    }
+                }
+            }
+        }
+     
+        return $filtered_property_list;
+    }
+    catch (\Exception $e) {
+        return $e->getMessage();
+    }
 }

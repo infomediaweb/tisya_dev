@@ -301,7 +301,7 @@ const routes = [
                 meta: {
                     isHeader: true,
                     requiresAuth: true,
-                    permission: ['Admin', 'Revenue', 'Reservations']
+                    permission: ['Admin', 'Revenue', 'Reservations','Front Office']
                 }
             },
             {

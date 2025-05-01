@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
-
 class BookingEnquiry extends Model{
     use HasFactory, SoftDeletes;
 
@@ -33,8 +32,7 @@ class BookingEnquiry extends Model{
     public function property(){
         return $this->belongsTo(TblHome::class, 'property_id');
     }
-    
-    protected $appends = ['formatted_checkin_date', 'formatted_checkout_date'];
+     protected $appends = ['formatted_checkin_date', 'formatted_checkout_date'];
 
     public function getFormattedCheckinDateAttribute()
     {

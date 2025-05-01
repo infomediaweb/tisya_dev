@@ -89,12 +89,15 @@
                     <div class="properties-listing">
                         @if(!empty($properties) && $properties->count() >0)
                             @foreach($properties as $property)
-                                <div class="property-item itemsList" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key, 'location_name' => $location_name, 'checkin_date' => $checkin_date, 'checkout_date' => $checkout_date, 'city_id' => $city_id, 'total_guests' => $total_guests, 'adultsCount' => $adultsCount, 'childrenCount' => $childrenCount, 'guestCount' => $guestCount]) }}', '_blank');" 
-                                    style="cursor: pointer;">
+                                <div  class="property-item itemsList" >
                                     <div class="row">
                                         <div class="col-12 col-lg-5 position-relative col-xxl-4">
                                             <a  href="{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key,
-                                                        'location_name' => $location_name,
+                                                        'location_name' => request()->input('location_name'),
+                                                        'filter_type' => request()->input('filter_type'),
+                                                        'location' => request()->input('location'),
+                                                        'type' => request()->input('type'),
+                                                        
                                                         'checkin_date' => $checkin_date, 
                                                         'checkout_date' => $checkout_date, 
                                                         'city_id' => $city_id,
@@ -136,10 +139,11 @@
                                                 </a>
                                             @endif
                                         </div>
-                                        <div class="col-12 col-lg align-self-center py-3">
+                                        <div class="col-12 col-lg align-self-center py-3" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key, 'location_name' => $location_name, 'checkin_date' => $checkin_date, 'checkout_date' => $checkout_date, 'city_id' => $city_id, 'total_guests' => $total_guests, 'adultsCount' => $adultsCount, 'childrenCount' => $childrenCount, 'guestCount' => $guestCount]) }}', '_blank');" 
+                                    style="cursor: pointer;">
                                             <h2>{{ $property->home_name }}</h2>
                                             <div class="location-state">
-                                                        @if(!empty($property->locationData->location_name) && !empty($property->state))
+                                                @if(!empty($property->locationData->location_name) && !empty($property->state))
                                                     {{ $property->locationData->location_name }}, {{ $property->state }}
                                                 @elseif(!empty($property->locationData->location_name))
                                                     {{ $property->locationData->location_name }}
@@ -172,7 +176,8 @@
                                                 </div>
                                             @endif
                                         </div>
-                                        <div class="col-12 col-lg-auto">
+                                        <div class="col-12 col-lg-auto" onclick="window.open('{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key, 'location_name' => $location_name, 'checkin_date' => $checkin_date, 'checkout_date' => $checkout_date, 'city_id' => $city_id, 'total_guests' => $total_guests, 'adultsCount' => $adultsCount, 'childrenCount' => $childrenCount, 'guestCount' => $guestCount]) }}', '_blank');" 
+                                    style="cursor: pointer;">
                                             <div class="card price-card h-100">
                                                 <div class="card-body">
                                                     <!--<h3>From ₹{{ number_format($property->per_night_price * $property->noOfNights) }}</h3>-->
@@ -181,7 +186,12 @@
                                                 </div>
                                                 <div class="card-footer">
                                                     <a  href="{{ route('property-detail', ['home_type' => strtolower($property->home_type),'slug' => $property->url_key,
-                                                    'location_name' => $location_name,
+                                                    
+                                                    'location_name' => request()->input('location_name'),
+                                                    'filter_type' => request()->input('filter_type'),
+                                                    'location' => request()->input('location'),
+                                                    'type' => request()->input('type'),
+                                                    
                                                     'checkin_date' => $checkin_date, 
                                                     'checkout_date' => $checkout_date, 
                                                     'city_id' => $city_id,
@@ -300,5 +310,58 @@
         //    $(this).remove();
         // })
     })
+    
+     /* after filter load more this call */
+    function reinitializeScripts() {
+    console.log("Reinitializing scripts...");
+
+    // ✅ Reinitialize Swiper
+    new Swiper('.swiper-property-image', {
+        spaceBetween: 30,
+        pagination: {
+            el: ".swiper-property-image .swiper-pagination",
+            dynamicBullets: true,
+            clickable: true
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev'
+        },
+        mousewheel: {
+            enabled: true,
+            forceToAxis: true
+        },
+    });
+
+    // ✅ Reinitialize ScrollTrigger
+    ScrollTrigger.refresh();
+
+    ScrollTrigger.matchMedia({
+        "(min-width: 1300px)": function () {
+            ScrollTrigger.create({
+                pin: '.filter-card',
+                start: 'top top+=120px',
+                end: function(){
+                    let h = ($(".properties-col").height() - $('.filter-card').height()) - 120;
+                    return `${h}px top`;
+                },
+            });
+            $(".nano").nanoScroller({ alwaysVisible: true });
+        },
+        "(max-width: 991px)": function () {
+            $(".nano").nanoScroller({ destroy: true });
+        }
+    });
+
+    // ✅ Restore click events
+    $(document).on("click", '.mch-filter', function(){
+        $('body').addClass('mch-filter-open');
+    });
+
+    $(document).on("click", '.filter-card .close-btn', function(){
+        $('body').removeClass('mch-filter-open');
+    });
+}
+    
 </script>
 @endsection

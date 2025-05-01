@@ -1,12 +1,12 @@
 
+
 @extends('layout.main')
 @section('content')
-
 <section class="section properties-listing">
-    @if($properties->count() >0)
-    <div class="container">
+        @if($properties->count() >0)
+        <div class="container">
         <div class="section-heading">
-           <h1>Properties in {{ $getTag->tags_name ?? "" }}</h1>
+            <h1>Properties in {{ $getTag->tags_name ?? "" }}</h1>
             <div class="total-stays"><span class="totStayCount">{{ $totalStays }} {{ $totalStays == 1 ? 'Stay' : 'Stays' }}</span></div>
         </div>
         <div class="row gx-5">
@@ -18,10 +18,11 @@
                     </div>
                     <div class="col-auto">
                         <div class="fl-group">
+                          
                             <ul class="m-0 d-flex list-unstyled">
                                 <li class="dropdown">
                                     <a class="btn dropdown-toggle px-3" href="javascript:void(0)" data-bs-toggle="dropdown" aria-expanded="true">
-                                        <span class="sortText">{{ $sortOrder === 'high_to_low' ? 'Price: High to Low' : 'Price: Low to High' }}</span>
+                                       <span class="sortText"> {{ $sortOrder === 'high_to_low' ? 'Price: High to Low' : 'Price: Low to High' }} </span>
                                         <span class="icon-chevron-down"></span>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end">
@@ -42,21 +43,20 @@
                                     </div>
                                 </li>
                             </ul>
-                            
                         </div>
                     </div>
                 </div>
-                <div class="items">
+                <div class="itemss">
                     <div class="properties-listing">
                         @if(!empty($properties) && $properties->count() >0)
                             @foreach($properties as $property)
                                 <div  class="property-item">
                                     <div class="row">
                                         <div class="col-12 col-lg-5 position-relative col-xxl-4">
-                                         <a href="{{ route('property-detail', ['home_type' => strtolower($property->home_type), 'slug' => $property->url_key]) }}" target="_blank" class="swiper swiper-property-image">
+                                            <a  href="{{ route('property-detail', ['slug' => $property->url_key]) }}" target="_blank" class="swiper swiper-property-image">
                                                 <div class="swiper-wrapper">
-                                                    @if($property->homeImageVideo->isNotEmpty())
-                                                    @foreach ($property->homeImageVideo->where('type', 'image') as $media)
+                                                    @if($property->images->isNotEmpty())
+                                                    @foreach ($property->images->where('type', 'image') as $media)
     
                                                             <div class="swiper-slide">
                                                                 <div class="imgBox">
@@ -66,9 +66,7 @@
                                                         @endforeach
                                                     @else
                                                     <div class="swiper-slide">
-                                                        <div class="imgBox">
                                                                 <img loading="lazy" src="{{ asset('assets/images/noimage-property.jpg') }}" class="w-100" alt="Image Title Goes Here">
-                                                            </div>
                                                             </div>
                                                     @endif
                                                 </div>
@@ -76,17 +74,15 @@
                                                 <div class="swiper-button-next"></div>
                                                 <div class="swiper-pagination"></div>
                                             </a>
-                                            
-                                        @php
-                                        $firstTag = $property->tags->first();
-                                        @endphp
-                                        @if(!empty($firstTag))
-                                            <a href="{{ route('tag-property-list', ['tag_name' => $firstTag->tags_name ?? '']) }}" class="badge z-1 text-decoration-none 
-                                                text-bg-secondary text-white position-absolute top-0 left-0 fw-normal m-3">
-                                                {{ $firstTag->tags_name }}
-                                            </a>
-                                        @endif
-                                            
+                                            @php
+                                                $firstTag = $property->tags->first();
+                                            @endphp
+                                            @if(!empty($firstTag))
+                                                <a href="{{ route('tag-property-list', ['tag_name' => $firstTag->tags_name ?? '']) }}" class="badge z-1 text-decoration-none 
+                                                    text-bg-secondary text-white position-absolute top-0 left-0 fw-normal m-3">
+                                                    {{ $firstTag->tags_name }}
+                                                </a>
+                                            @endif
                                         </div>
                                         <div class="col-12 col-lg align-self-center py-3">
                                             <h2>{{ $property->home_name }}</h2>
@@ -94,9 +90,9 @@
                                                         {{ $property->locationData->location_name ?? '' }}, {{ $property->state }}
                                                     </div>
                                             <ul class="nav property-short-info my-3 my-lg-4">
-                                               <li><span class="icon-users"></span>Upto {{ $property->maximum_number_of_guests == 1 ? $property->maximum_number_of_guests . ' Guest' : $property->maximum_number_of_guests . ' Guests' }}</li>
+                                                <li><span class="icon-users"></span>{{ $property->maximum_number_of_guests == 1 ? $property->maximum_number_of_guests . ' Guest' : $property->maximum_number_of_guests . ' Guests' }}</li></li>
                                                 <li><span class="icon-bed"></span>{{ $property->no_of_bedrooms == 1 ? $property->no_of_bedrooms . ' Room' : $property->no_of_bedrooms . ' Rooms' }}</li>
-                                                 <li><span class="icon-bath"></span>{{ $property->no_of_bathrooms == 1 ? $property->no_of_bathrooms . ' Bathroom' : $property->no_of_bathrooms . ' Bathrooms' }}</li>
+                                                <li><span class="icon-bath"></span>{{ $property->no_of_bathrooms == 1 ? $property->no_of_bathrooms . ' Bathroom' : $property->no_of_bathrooms . ' Bathrooms' }}</li>
                                             </ul>
                                             <ul class="amenities-list list-unstyled m-0">
                                                 @foreach ($property->amenities->take(4) as $amenity)
@@ -119,25 +115,19 @@
                                         <div class="col-12 col-lg-auto">
                                             <div class="card price-card h-100">
                                                 <div class="card-body">
-                                                     <h3>From ₹{{ number_format($property->per_night_price * $property->noOfNights) }}</h3>
-                                            
-                                                 
-                                                    <small>per night  +  taxes</small>
+                                                     <h3>From ₹{{ number_format($property->per_night_price) }}</h3>
+                                                     <small>per night  +  taxes</small>
                                                 </div>
                                                 <div class="card-footer">
-                  <a href="{{ route('property-detail', ['home_type' => strtolower($property->home_type), 'slug' => $property->url_key]) }}" target="_blank" class="btn btn-primary">
-                                                        View Detail</a>
+                                                    <a  href="{{ route('property-detail', ['slug' => $property->url_key]) }}" target="_blank" class="btn btn-primary">View Detail</a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
                             @endforeach
                         @endif
                     </div>
-                    
-                    
                     @if($properties->hasMorePages())
                         <div class="properties-loader text-center mt-5">
                             <a class="btn btn-link loadPaginationProperty" data-page="2">
@@ -150,25 +140,26 @@
                             </a>
                         </div>
                     @endif
-                    
                 </div>    
 
-
             </div>
 
 
         </div>
-    </div>
-    @else 
-        <div class="container">
-            <div class="section-heading">
-                <div class="text-center">
-                    No Property Found!
+        </div>
+        @else 
+            <div class="container">
+                <div class="section-heading">
+                    <div class="text-center">
+                        No Property Found!
+                    </div>
                 </div>
+
             </div>
-        </div>
-    @endif
+        @endif
+    
 </section>
+
 
 <script>
 
@@ -234,7 +225,7 @@
         })
         
          //------------------------filter & sorting code--------------------//
-         $(document).on("click",'.highToLow', function(){
+        $(document).on("click",'.highToLow', function(){
            sort_by = 'high_to_low';
            type ='sorting';
            $('.sortText').text('High To Low');
@@ -261,5 +252,3 @@
    
 </script>
 @endsection
-
-

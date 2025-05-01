@@ -3,8 +3,9 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=0, viewport-fit=cover">
     <title>Tisya Stays</title>
-    <meta name="description" content="">
-    <meta name="keywords" content="">
+    <meta name="title" content="{{ isset($property->meta_title) ? $property->meta_title : 'Tisya Stays' }}">
+    <!--<meta name="description" content="{{ isset($property->meta_description) ? $property->meta_description : 'Tisya Stays' }}">-->
+    <meta name="keywords" content="{{ isset($property->meta_keywords) ? $property->meta_keywords : 'tisya, home, vacation, property' }}">
     <meta name="google-site-verification" content="QHfygflq-AtTrHmpbB67cYCVoh5V4506svv9gqlW_HQ" />
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,8 +13,12 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Tenor+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}?v=1.1.4">
     
-     <meta property="og:title" content="{{ isset($property->home_name) ? $property->home_name : '' }}" />
+    <meta property="og:title" content="{{ isset($property->meta_title) ? $property->meta_title : '' }}" />
     <meta property="og:url" content="{{ request()->url() }}" />
+    <meta property="og:description" content="{{ isset($property->meta_description) ? $property->meta_description : '' }}" />
+    <meta property="og:image" content="{!! $property->image_full_path ?? 'https://www.tisyastays.com/storage/home/images/default.jpg' !!}" />
+
+    <meta property="og:type" content="website">
     
     <style>
         .header-main{
@@ -21,10 +26,7 @@
         }
     </style>
     @php
-    
        $page = Route::currentRouteName();
-
-
     @endphp
     <style>
         
@@ -44,7 +46,6 @@
                 margin-top:4px;
             }
         }
-         .search-hide .small-search-outer{display: none !important;}
     </style>
 
 
@@ -112,9 +113,6 @@
 <!--   fbq('track', 'SubmitApplication');-->
 <!--@endif-->
 
-<!--@if($page =='contactus')-->
-<!--   fbq('track', 'Contact');-->
-<!--@endif-->
 <!--</script>-->
 <!--<noscript>-->
 <!--<img height="1" width="1" -->

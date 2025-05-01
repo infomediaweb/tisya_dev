@@ -241,6 +241,8 @@ class GetRuBookings extends Command{
                                     $propertyBooking['ru_booking_status'] = 'Confirmed';
                                     $propertyBooking['type'] = 'Location';
                                     $propertyBooking['channel'] = 'RU';
+                                    $propertyBooking['property_booking_status'] = 'Confirmed';
+                                    $propertyBooking['payment_status'] = 'Paid';
                                     $propertyBooking['no_of_adult'] = $stayInfo['NumberOfGuests'];
                                     $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>$customerInfo['SurName'], 'email'=>$customerInfo['Email'] , 'mobile_number'=>$customerInfo['MessagingContactId']));
                                     $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($stayInfo['DateFrom']));
@@ -265,6 +267,8 @@ class GetRuBookings extends Command{
                                     $propertyBooking['ru_booking_status'] = 'Confirmed';
                                     $propertyBooking['type'] = 'Location';
                                     $propertyBooking['channel'] = 'Agoda';
+                                    $propertyBooking['property_booking_status'] = 'Confirmed';
+                                    $propertyBooking['payment_status'] = 'Paid';
                                     $propertyBooking['no_of_adult'] = $stayInfo['NumberOfGuests'];
                                     $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>$customerInfo['SurName'], 'email'=>$customerInfo['Email'] , 'mobile_number'=>$customerInfo['MessagingContactId']));
                                     $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($stayInfo['DateFrom']));
@@ -290,6 +294,8 @@ class GetRuBookings extends Command{
                                     $propertyBooking['type'] = 'Location';
                                     $propertyBooking['channel'] = 'Booking.com';
                                     $propertyBooking['no_of_adult'] = $stayInfo['NumberOfGuests'];
+                                    $propertyBooking['property_booking_status'] = 'Confirmed';
+                                    $propertyBooking['payment_status'] = 'Paid';
                                     $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>$customerInfo['SurName'], 'email'=>$customerInfo['Email'] , 'mobile_number'=>$customerInfo['Phone']));
                                     $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($stayInfo['DateFrom']));
                                     $propertyBooking['checkout_date'] = date('Y-m-d', strtotime($stayInfo['DateTo']));
@@ -316,6 +322,8 @@ class GetRuBookings extends Command{
                                         $propertyBooking['type'] = 'Location';
                                         $propertyBooking['channel'] = 'Airbnb';
                                         $propertyBooking['no_of_adult'] = $stayInfo['NumberOfGuests'];
+                                        $propertyBooking['property_booking_status'] = 'Confirmed';
+                                        $propertyBooking['payment_status'] = 'Paid';
                                         $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>$customerInfo['SurName'], 'email'=>$customerInfo['Email'] , 'mobile_number'=>$customerInfo['Phone']));
                                         $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($stayInfo['DateFrom']));
                                         $propertyBooking['checkout_date'] = date('Y-m-d', strtotime($stayInfo['DateTo']));
@@ -336,6 +344,8 @@ class GetRuBookings extends Command{
                                         $propertyBooking['type'] = 'Location';
                                         $propertyBooking['channel'] = 'Airbnb';
                                         $propertyBooking['no_of_adult'] = $reservation['NumberOfGuests'];
+                                        $propertyBooking['property_booking_status'] = 'Confirmed';
+                                        $propertyBooking['payment_status'] = 'Paid';
                                         $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>($customerInfo['SurName']=='not provided'?'':$customerInfo['SurName']), 'email'=>$customerInfo['Email'] , 'mobile_number'=>(isset($customerInfo['MobilePhone'][0]))?$customerInfo['MobilePhone'][0]:'N/A'));
                                         $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($reservation['DateFrom']));
                                         $propertyBooking['checkout_date'] = date('Y-m-d', strtotime($reservation['DateTo']));
@@ -361,6 +371,8 @@ class GetRuBookings extends Command{
                                     $propertyBooking['type'] = 'Location';
                                     $propertyBooking['channel'] = 'MakeMyTrip';
                                     $propertyBooking['no_of_adult'] = $stayInfo['NumberOfGuests'];
+                                    $propertyBooking['property_booking_status'] = 'Confirmed';
+                                    $propertyBooking['payment_status'] = 'Paid';
                                     $propertyBooking['customer_detail'] = json_encode(array('first_name'=>$customerInfo['Name'], 'last_name'=>$customerInfo['SurName'], 'email'=>$customerInfo['Email'] , 'mobile_number'=>'N/A'));
                                     $propertyBooking['checkin_date'] = date('Y-m-d', strtotime($stayInfo['DateFrom']));
                                     $propertyBooking['checkout_date'] = date('Y-m-d', strtotime($stayInfo['DateTo']));
@@ -368,6 +380,8 @@ class GetRuBookings extends Command{
 
 
                                 $price = $propertyBooking['payable_amount'];
+                                $propertyBooking['property_booking_status'] = 'Confirmed';
+                                $propertyBooking['payment_status'] = 'Paid';
                                 $propertyBooking['paid_amount'] = $price;
                                 $getAppliedGst  = getAppliedGst($price);
                                 if($getAppliedGst){

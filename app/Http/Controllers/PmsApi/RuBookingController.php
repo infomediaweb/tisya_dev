@@ -23,9 +23,10 @@ class RuBookingController extends Controller{
     public function setBookingHandlerAPi(){
         $reqXml = "<LNM_PutHandlerUrl_RQ>
                     <Authentication>
-                       
+                        <UserName>Gagan@tisyastays.com</UserName> 
+                        <Password>Tisyastays@1234</Password>
                     </Authentication>
-                   
+                    <HandlerUrl>https://tisyastays.rentals.management/ru/webhook/get/bookings</HandlerUrl>
                 </LNM_PutHandlerUrl_RQ>";
         $xmlResponse = MasterHelper::makeXmlRequest($reqXml);
         dd($xmlResponse);

@@ -55,10 +55,10 @@
                     <div class="properties-listing">
                         @if(!empty($properties) && $properties->count() >0)
                             @foreach($properties as $property)
-                                <div  class="property-item" target="_blank">
+                                <div  class="property-item">
                                     <div class="row">
                                         <div class="col-12 col-lg-5 position-relative col-xxl-4">
-                                         <a href="{{ route('property-detail', ['home_type' => strtolower($property->home_type), 'slug' => $property->url_key]) }}" target="_blank" class="swiper swiper-property-image">
+                                            <a  href="{{ route('property-detail', ['slug' => $property->url_key]) }}" target="_blank" class="swiper swiper-property-image">
                                                 <div class="swiper-wrapper">
                                                     @if($property->homeImageVideo->isNotEmpty())
                                                     @foreach ($property->homeImageVideo->where('type', 'image') as $media)
@@ -82,7 +82,7 @@
                                                 <div class="swiper-pagination"></div>
                                             </a>
                                             @php
-                                            $firstTag = $property->tags->first();
+                                                $firstTag = $property->tags->first();
                                             @endphp
                                             @if(!empty($firstTag))
                                                 <a href="{{ route('tag-property-list', ['tag_name' => $firstTag->tags_name ?? '']) }}" class="badge z-1 text-decoration-none 
@@ -122,15 +122,15 @@
                                         <div class="col-12 col-lg-auto">
                                             <div class="card price-card h-100">
                                                 <div class="card-body">
-                                                     <h3>From ₹{{ number_format($property->per_night_price * $property->noOfNights) }}</h3>
+                                                     <!--<h3>From ₹{{ number_format($property->per_night_price * $property->noOfNights) }}</h3>-->
+                                                     
+                                                     <h3>From ₹{{ number_format($property->per_night_price) }}</h3>
                                             
                                                  
                                                     <small>per night  +  taxes</small>
                                                 </div>
                                                 <div class="card-footer">
-                                                    
-                                             <a href="{{ route('property-detail', ['home_type' => strtolower($property->home_type), 'slug' => $property->url_key]) }}" target="_blank"  class="btn btn-primary">
-                                                        View Detail</a>
+                                                    <a  href="{{ route('property-detail', ['slug' => $property->url_key]) }}" target="_blank" class="btn btn-primary">View Detail</a>
                                                 </div>
                                             </div>
                                         </div>

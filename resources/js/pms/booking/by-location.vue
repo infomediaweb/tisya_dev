@@ -224,27 +224,88 @@
                                                             <div class="col-6 col-lg-3">
                                                                 <div class="form-group">
                                                                     <label for="">Email Address<span class="text-danger">*</span></label>
-                                                                    <Field
+                                                                    <!-- <Field
                                                                         type="text"
                                                                         name="email_address"
                                                                         class="form-control"
                                                                         :class="{'border-danger': errors.email_address}"
                                                                         rules="required|email"
                                                                         v-model="customerDetail.email"
-                                                                    />
+                                                                    /> -->
+
+                                                                    <div
+                                                                        class="tags-input-wrapper"
+                                                                        :class="{'border-danger': errors.email_address}">
+                                                                        <ul>
+                                                                            <li
+                                                                                class="tag-item"
+                                                                                v-for="(obj, idx) in multiTags.emailAddresses"
+                                                                                v-if="multiTags.emailAddresses.length">
+                                                                                <div class="tag-content">
+                                                                                    <span>{{ obj }}</span>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        class="tag-action"
+                                                                                        @click="onDeleteTagCallback(idx, 'emailAddresses')">
+                                                                                        <i class="bi bi-x-lg"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </li>
+                                                                            <li class="tag-input">
+                                                                                <Field
+                                                                                    type="email"
+                                                                                    name="email_address"
+                                                                                    class="form-control"
+                                                                                    :rules="!multiTags.emailAddresses.length ? 'required|email' : 'email'"
+                                                                                    @keypress.enter.prevent="onEnterCallbackTag($event, errors.email_address, 'email_address', 'emailAddresses')"
+                                                                                />
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+
                                                                 </div>
                                                             </div>
                                                             <div class="col-6 col-lg-3">
                                                                 <div class="form-group">
                                                                     <label for="">Mobile Number<span class="text-danger">*</span></label>
-                                                                    <Field
+                                                                    <!-- <Field
                                                                         type="text"
                                                                         name="mobile_number"
                                                                         class="form-control"
                                                                         :class="{'border-danger': errors.mobile_number}"
-                                                                        rules="required|numeric|min:7|max:13"
+                                                                        rules="required|numeric|min:7|max:15"
                                                                         v-model="customerDetail.mobile_number"
-                                                                    />
+                                                                    /> -->
+                                                                    <div class="row gx-2">
+                                                                        <div class="col-auto">
+                                                                            <Field
+                                                                                as="select"
+                                                                                name="c_code"
+
+                                                                                class="form-control form-select c-code pe-2"
+                                                                                :class="{'border-danger': errors.c_code}"
+                                                                                v-model="countryCode"
+
+                                                                                >
+
+                                                                                <option
+                                                                                    v-for="(obj, idx) in countryCodes"
+                                                                                    :value="obj">
+                                                                                    {{ obj }}
+                                                                                </option>
+                                                                            </Field>
+                                                                        </div>
+                                                                        <div class="col">
+                                                                            <Field
+                                                                                type="text"
+                                                                                name="mobile_number"
+                                                                                class="form-control"
+                                                                                :class="{'border-danger': errors.mobile_number}"
+                                                                                rules="required|numeric|min:7|max:15"
+                                                                                v-model="customerDetail.mobile_number"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="col-6 col-lg-3">
@@ -274,99 +335,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <!-- <div class="col-12">
-                                                                <div class="form-group">
-                                                                    <div class="form-check form-check-lg form-check-box border-0 p-0">
-                                                                        <div class="row gx-2">
-                                                                            <div class="col-auto">
-                                                                                <Field
-                                                                                    type="checkbox"
-                                                                                    name="cbk-invoice"
-                                                                                    id="cbk-invoice"
-                                                                                    class="form-check-input"
-                                                                                    v-model="isInvoiceRequired"
-                                                                                    :value="1"
-                                                                                    :unchecked-value="0"
-                                                                                />
-                                                                            </div>
-                                                                            <div class="col">
-                                                                                <label for="cbk-invoice">Need Invoice</label>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div> -->
 
-                                                            <!-- <template v-if="isInvoiceRequired == 1">
-                                                                <div class="col-6 col-lg-3">
-                                                                    <div class="form-group">
-                                                                        <label for="">State<span class="text-danger">*</span></label>
-                                                                        <Field
-                                                                            name="company_state"
-                                                                            as="select"
-                                                                            class="form-control"
-                                                                            :class="{'border-danger': errors.company_state}"
-                                                                            rules="required">
-                                                                            <option value="" selected disabled>Select State</option>
-                                                                            <option
-                                                                                v-for="(obj, index) in state"
-                                                                                :value="obj.id">
-                                                                                {{ obj.name }}
-                                                                            </option>
-                                                                        </Field>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-6 col-lg-3">
-                                                                    <div class="form-group">
-                                                                        <label for="">Location<span class="text-danger">*</span></label>
-                                                                        <Field
-                                                                            type="text"
-                                                                            name="company_location"
-                                                                            class="form-control"
-                                                                            :class="{'border-danger': errors.company_location}"
-                                                                            rules="required"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-6 col-lg-3">
-                                                                    <div class="form-group">
-                                                                        <label for="">Company Name<span class="text-danger">*</span></label>
-                                                                        <Field
-                                                                            type="text"
-                                                                            name="company_name"
-                                                                            class="form-control"
-                                                                            :class="{'border-danger': errors.company_name}"
-                                                                            rules="required"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-6 col-lg-3">
-                                                                    <div class="form-group">
-                                                                        <label for="">GSTIN<span class="text-danger">*</span></label>
-                                                                        <Field
-                                                                            type="text"
-                                                                            name="company_gstin"
-                                                                            class="form-control"
-                                                                            :class="{'border-danger': errors.company_gstin}"
-                                                                            rules="required|min:15|max:15"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <div class="form-group">
-                                                                        <label for="">Company Address<span class="text-danger">*</span></label>
-                                                                        <Field
-                                                                            as="textarea"
-                                                                            name="company_address"
-                                                                            cols="30"
-                                                                            rows="4"
-                                                                            class="form-control"
-                                                                            :class="{'border-danger': errors.company_address}"
-                                                                            rules="required"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            </template> -->
 
 
                                                         </div>
@@ -573,6 +542,240 @@
     const dataRow = ref({})
 
 
+    const formRef = ref({
+        email_address:''
+    })
+
+    const multiTags = ref({
+        emailAddresses: [],
+    })
+
+    const onDeleteTagCallback = (idx, type) => {
+        idx ? multiTags.value[type].splice(idx, 1) : multiTags.value[type].splice(0, 1)
+    }
+
+    const onEnterCallbackTag = (e, error, fieldName, type) => {
+        let value = e.target.value.toLowerCase()
+        if(!multiTags.value[type].includes(value) && value && !error){
+            multiTags.value[type].push(e.target.value)
+
+            e.target.value = null
+
+            formRef.value.resetField(fieldName, false)
+        }
+    }
+
+
+    const countryCode = ref("+91")
+    const countryCodes = ref([
+        "+1",  // United States, Canada, etc.
+        "+7",  // Russia, Kazakhstan
+        "+20", // Egypt
+        "+27", // South Africa
+        "+30", // Greece
+        "+31", // Netherlands
+        "+32", // Belgium
+        "+33", // France
+        "+34", // Spain
+        "+36", // Hungary
+        "+39", // Italy
+        "+40", // Romania
+        "+41", // Switzerland
+        "+43", // Austria
+        "+44", // United Kingdom
+        "+45", // Denmark
+        "+46", // Sweden
+        "+47", // Norway
+        "+48", // Poland
+        "+49", // Germany
+        "+51", // Peru
+        "+52", // Mexico
+        "+53", // Cuba
+        "+54", // Argentina
+        "+55", // Brazil
+        "+56", // Chile
+        "+57", // Colombia
+        "+58", // Venezuela
+        "+60", // Malaysia
+        "+61", // Australia
+        "+62", // Indonesia
+        "+63", // Philippines
+        "+64", // New Zealand
+        "+65", // Singapore
+        "+66", // Thailand
+        "+81", // Japan
+        "+82", // South Korea
+        "+84", // Vietnam
+        "+86", // China
+        "+90", // Turkey
+        "+91", // India
+        "+92", // Pakistan
+        "+93", // Afghanistan
+        "+94", // Sri Lanka
+        "+95", // Myanmar
+        "+98", // Iran
+        "+211", // South Sudan
+        "+212", // Morocco
+        "+213", // Algeria
+        "+216", // Tunisia
+        "+218", // Libya
+        "+220", // Gambia
+        "+221", // Senegal
+        "+222", // Mauritania
+        "+223", // Mali
+        "+224", // Guinea
+        "+225", // Côte d'Ivoire
+        "+226", // Burkina Faso
+        "+227", // Niger
+        "+228", // Togo
+        "+229", // Benin
+        "+230", // Mauritius
+        "+231", // Liberia
+        "+232", // Sierra Leone
+        "+233", // Ghana
+        "+234", // Nigeria
+        "+235", // Chad
+        "+236", // Central African Republic
+        "+237", // Cameroon
+        "+238", // Cape Verde
+        "+239", // São Tomé and Príncipe
+        "+240", // Equatorial Guinea
+        "+241", // Gabon
+        "+242", // Republic of Congo
+        "+243", // Democratic Republic of Congo
+        "+244", // Angola
+        "+245", // Guinea-Bissau
+        "+248", // Seychelles
+        "+249", // Sudan
+        "+250", // Rwanda
+        "+251", // Ethiopia
+        "+252", // Somalia
+        "+253", // Djibouti
+        "+254", // Kenya
+        "+255", // Tanzania
+        "+256", // Uganda
+        "+257", // Burundi
+        "+258", // Mozambique
+        "+260", // Zambia
+        "+261", // Madagascar
+        "+262", // Réunion, Mayotte
+        "+263", // Zimbabwe
+        "+264", // Namibia
+        "+265", // Malawi
+        "+266", // Lesotho
+        "+267", // Botswana
+        "+268", // Eswatini
+        "+269", // Comoros
+        "+290", // Saint Helena
+        "+291", // Eritrea
+        "+297", // Aruba
+        "+298", // Faroe Islands
+        "+299", // Greenland
+        "+350", // Gibraltar
+        "+351", // Portugal
+        "+352", // Luxembourg
+        "+353", // Ireland
+        "+354", // Iceland
+        "+355", // Albania
+        "+356", // Malta
+        "+357", // Cyprus
+        "+358", // Finland
+        "+359", // Bulgaria
+        "+370", // Lithuania
+        "+371", // Latvia
+        "+372", // Estonia
+        "+373", // Moldova
+        "+374", // Armenia
+        "+375", // Belarus
+        "+376", // Andorra
+        "+377", // Monaco
+        "+378", // San Marino
+        "+379", // Vatican
+        "+380", // Ukraine
+        "+381", // Serbia
+        "+382", // Montenegro
+        "+383", // Kosovo
+        "+385", // Croatia
+        "+386", // Slovenia
+        "+387", // Bosnia and Herzegovina
+        "+389", // North Macedonia
+        "+420", // Czech Republic
+        "+421", // Slovakia
+        "+423", // Liechtenstein
+        "+500", // Falkland Islands
+        "+501", // Belize
+        "+502", // Guatemala
+        "+503", // El Salvador
+        "+504", // Honduras
+        "+505", // Nicaragua
+        "+506", // Costa Rica
+        "+507", // Panama
+        "+508", // Saint Pierre and Miquelon
+        "+509", // Haiti
+        "+590", // Guadeloupe
+        "+591", // Bolivia
+        "+592", // Guyana
+        "+593", // Ecuador
+        "+594", // French Guiana
+        "+595", // Paraguay
+        "+596", // Martinique
+        "+597", // Suriname
+        "+598", // Uruguay
+        "+599", // Curaçao, Bonaire
+        "+670", // Timor-Leste
+        "+672", // Australian external territories
+        "+673", // Brunei
+        "+674", // Nauru
+        "+675", // Papua New Guinea
+        "+676", // Tonga
+        "+677", // Solomon Islands
+        "+678", // Vanuatu
+        "+679", // Fiji
+        "+680", // Palau
+        "+681", // Wallis and Futuna
+        "+682", // Cook Islands
+        "+683", // Niue
+        "+685", // Samoa
+        "+686", // Kiribati
+        "+687", // New Caledonia
+        "+688", // Tuvalu
+        "+689", // French Polynesia
+        "+690", // Tokelau
+        "+691", // Micronesia
+        "+692", // Marshall Islands
+        "+850", // North Korea
+        "+852", // Hong Kong
+        "+853", // Macau
+        "+855", // Cambodia
+        "+856", // Laos
+        "+880", // Bangladesh
+        "+886", // Taiwan
+        "+960", // Maldives
+        "+961", // Lebanon
+        "+962", // Jordan
+        "+963", // Syria
+        "+964", // Iraq
+        "+965", // Kuwait
+        "+966", // Saudi Arabia
+        "+967", // Yemen
+        "+968", // Oman
+        "+970", // Palestine
+        "+971", // United Arab Emirates
+        "+972", // Israel
+        "+973", // Bahrain
+        "+974", // Qatar
+        "+975", // Bhutan
+        "+976", // Mongolia
+        "+977", // Nepal
+        "+992", // Tajikistan
+        "+993", // Turkmenistan
+        "+994", // Azerbaijan
+        "+995", // Georgia
+        "+996", // Kyrgyzstan
+        "+998"  // Uzbekistan
+    ]);
+
+
     // For get location list
     const getLocation = async () => {
         axios.get(`/api/location/get/all`, {
@@ -718,7 +921,7 @@
                 tax.value = item.gst_percentage
                 extraGuestChargePerNight.value = item.extra_guest_charges
                 guestIncluded.value = item.guests_included
-                totalGuest.value = no_adults.value + no_children.value
+                totalGuest.value = no_adults.value
 
                 if(totalGuest.value > guestIncluded.value){
                     extraAddedGuestNumber.value = (totalGuest.value - guestIncluded.value)
@@ -819,7 +1022,7 @@
         v.totalTaxableAmount = totalTaxableAmount.value
         v.extraGuestCharge = extraGuestCharge.value
         v.booking_created_by = store.getters.user?.id
-
+        v.email_address = (multiTags.value.emailAddresses.length >0)?multiTags.value.emailAddresses:v.email_address
 
         axios.post('/api/property/booking', v).then(res => {
             if(res.data.status){
@@ -842,3 +1045,10 @@
 
 
 </script>
+
+
+<style scoped>
+    .c-code{
+        width:70px;
+    }
+</style>

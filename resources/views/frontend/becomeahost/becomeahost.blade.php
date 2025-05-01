@@ -1,11 +1,11 @@
 
 @extends('layout.main')
 @section('content')
-@if(session('success'))
-    <div class="alert alert-success" id="success-message">
-        {{ session('success') }}
-    </div>
-@endif
+<!--@if(session('success'))-->
+<!--    <div class="alert alert-success" id="success-message">-->
+<!--        {{ session('success') }}-->
+<!--    </div>-->
+<!--@endif-->
 
 
 <section class="section flex-wrap section-hero section-bg" style="min-height:60vh;">
@@ -53,6 +53,16 @@
                 </div>
             </div>
             <div class="col-12 col-lg">
+                
+                @if(session('success'))
+                    <div class="alert alert-success" id="success-message">
+                        {{ session('success') }}
+                    </div>
+                    <script>
+                        fbq('track', 'SubmitApplication');
+                    </script>
+                @endif
+                
                 <div class="form-box p-4 bg-white shadow rounded-4">
                      <h3 class="fw-bold text-primary">let's chat</h3>
                      <p>If you would like to see your Home in trusted hands, write to us!</p>
@@ -287,7 +297,7 @@
     $(document).ready(function() {
         setTimeout(function() {
             $('#success-message').fadeOut();
-        }, 1000);  
+        }, 3000);  
     });
 </script>
 <script>

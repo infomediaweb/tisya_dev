@@ -42,11 +42,15 @@ class PropertyBooking extends Model{
         'booking_from',
         'channel',
         'property_booking_status',
+        'created_by',
+        
         'razorpay_order_id',
+        'payment_status',
         'applied_discount_coupon',
         'tot_additional_charge',
         'no_of_nights',
-        'created_by',
+        'ru_response',
+        'base_price'
     ];
 
     protected $appends = ['tot_guests'];
@@ -100,6 +104,11 @@ class PropertyBooking extends Model{
         return $value;
     }
     
+    public function property(){
+        return $this->hasOne(TblHome::class, 'id', 'property_id')->with(['homeImage', 'owner', 'stateDetail']);
+
+    }
+    
    
 
     public function getAdditionalChargesAttribute($value){
@@ -109,11 +118,6 @@ class PropertyBooking extends Model{
         return $value;
     }
     
-    public function property(){
-        return $this->hasOne(TblHome::class, 'id', 'property_id')->with(['homeImage', 'owner', 'stateDetail']);
-
-    }
-
     public function getTotGuestsAttribute(){
 
         $totGuest = $this->no_of_adult;

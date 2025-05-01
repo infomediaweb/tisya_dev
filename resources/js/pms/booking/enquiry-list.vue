@@ -137,7 +137,10 @@
                                         <td><b>INR {{ currFormat(obj.total_amount) }}</b></td>
                                         <td>{{ obj.name }}</td>
                                         <td>{{ obj.email }}</td>
-                                        <td>{{ obj.phone_no }}</td>
+                                        <td>
+                                            <span v-if="obj.country_code">{{ obj.country_code }} - </span>{{ obj.phone_no }}
+                                        </td>
+
                                         <td class="text-center"><a href="javascript:void(0)" class="btn btn-sm btn-save btn-dark"  data-bs-toggle="modal" data-bs-target="#viewEnquiryModal" @click.prevent="viewEnquiry(obj)">View</a></td>
                                         <!-- <td>-</td> -->
                                     </tr>

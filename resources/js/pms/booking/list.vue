@@ -53,7 +53,7 @@
                                         />
                                     </div>
                                 </div>
-                                <!-- <div class="col-12 col-md-4 col-lg-3 col-xl-2 col-xxl">
+                                <div class="col-12 col-md-4 col-lg-3 col-xl-2 col-xxl">
                                     <div class="form-group mb-0">
                                         <Field
                                             name="created_by"
@@ -69,7 +69,7 @@
                                             </option>
                                         </Field>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <div class="col-12 col-md-4 col-lg-3 col-xl-2 col-xxl">
                                     <div class="form-group mb-0">
@@ -208,16 +208,17 @@
                                     <tr>
                                         <th width="30"></th>
                                         <th>Booking ID</th>
-                                       <!--  <th>Created By</th> -->
+                                        <th>Created By</th>
                                         <th>Guest Detail</th>
                                         <th>Booking Detail</th>
                                         <th>Property Name</th>
+                                        <th>Internal Name</th>
                                         <th>Channel</th>
                                         <th>Price</th>
                                         <th nowrap>Payment Status</th>
                                         <th>Booking Status</th>
                                         <!-- <th align="center">Invoice</th> -->
-                                        <th width="125" v-if="role=='Admin' || role=='Finance' ||  role =='Front Office' ||  role =='Reservations'">Action</th>
+                                        <th width="125" v-if="role=='Admin' || role=='Finance' ||  role =='Reservations' || role =='Front Office'">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody v-for="(obj, index) in list" :key="index">
@@ -234,19 +235,43 @@
                                             <!-- <small><i class="bi bi-calendar2-check"></i> 01 May 2024 <i class="bi bi-clock"></i> 12:05 PM</small> -->
                                             <small><i class="bi bi-calendar2-check"></i> {{ obj.created_at }}</small>
                                         </td>
-                                       <!--  <td nowrap>
-                                           {{ obj.user?.role }}
+                                        <td nowrap>
+                                           {{ obj.user?.name }}
+                                        </td>
+                                        <!-- <td nowrap>
+                                            <h6 class="m-0">{{ obj.customer_detail.first_name }} {{ obj.customer_detail.last_name }}</h6>
+                                            <small v-if="obj.channel !='Airbnb'">{{ obj.customer_detail.country_code }} - {{ obj.customer_detail.mobile_number }} | {{ obj.customer_detail.email }}</small>
+                                            <small v-else=>{{ obj.customer_detail.country_code }} - {{ obj.customer_detail.mobile_number }} | N/A</small>
                                         </td> -->
+
+
                                         <td nowrap>
                                             <h6 class="m-0">{{ obj.customer_detail.first_name }} {{ obj.customer_detail.last_name }}</h6>
-                                            <small>{{ obj.customer_detail.mobile_number }} | {{ obj.customer_detail.email }}</small>
+
+                                            <small v-if="obj.channel !== 'Airbnb'">
+                                                <span v-if="obj.customer_detail.country_code">
+                                                    {{ obj.customer_detail.country_code }} -
+                                                </span>
+                                                {{ obj.customer_detail.mobile_number }} | {{ obj.customer_detail.email }}
+                                            </small>
+
+                                            <small v-else>
+                                                <span v-if="obj.customer_detail.country_code">
+                                                    {{ obj.customer_detail.country_code }} -
+                                                </span>
+                                                {{ obj.customer_detail.mobile_number }} | N/A
+                                            </small>
                                         </td>
+
+
+
                                         <td nowrap>
                                             <i class="bi bi-calendar2-check"></i> Check-in: {{ obj.checkin_date }} | Check-out: {{ obj.checkout_date }}<br>
                                             <i class="bi bi-moon"></i> No. of nights: {{ noOfNights(obj.checkin_date, obj.checkout_date) }}<br>
                                             <i class="bi bi-people"></i> No. of guests: {{ obj.no_of_adult }} Adult<span v-if="obj.no_of_adult >1">s</span> | {{ obj.no_of_children }} Children
                                         </td>
                                         <td>{{ obj.home_name }}</td>
+                                        <td>{{ obj.internal_name }}</td>
                                         <td>{{ obj.channel }}</td>
                                         <td nowrap>
                                             <b>INR {{ currFormat(obj.payable_amount) }}</b>
@@ -275,14 +300,15 @@
                                                 <i class="bi bi-download"></i>
                                             </button>
                                         </td> -->
-                                        <td v-if="role=='Admin' || role=='Reservations' ||  role =='Front Office' || role=='Finance'">
+                                        <td v-if="role=='Admin' || role=='Reservations' || role=='Finance' || role =='Front Office'">
+
                                             <ul class="action-btn-group mb-0 mw-0" v-if="obj.booking_from != 'ru'">
                                                 <li v-if="(obj.payable_amount > obj.paid_amount) && (role=='Admin' || role=='Finance') && obj.property_booking_status !='Canceled'" >
                                                     <router-link :to="{name:'booking/payment-request', params:{ id: obj.id }}" class="btn btn-sm btn-save btn-primary">
                                                         Payment Request
                                                     </router-link>
                                                 </li>
-                                                <li v-if="(obj.booking_status == 'Paid' || obj.booking_status == 'paid' && role=='Admin' || role=='Finance' ||  role =='Front Office' || role=='Reservations') && !obj.invoice && obj.property_booking_status !='Canceled'">
+                                                <li v-if="(obj.property_booking_status == 'Confirmed' && role=='Admin' || role=='Finance' || role =='Reservations' || role =='Front Office') && !obj.invoice && obj.property_booking_status =='Confirmed'">
                                                     <router-link :to="{name:'booking/checkin', params:{ id: obj.id }}" class="btn btn-sm btn-save btn-info">
                                                         Check In
                                                     </router-link>
@@ -309,7 +335,7 @@
                                                 </li>
                                             </ul>
                                             <ul  class="action-btn-group mb-0 mw-0" v-else>
-                                                <li v-if="(role=='Admin' || role=='Finance') && !obj.invoice">
+                                                <li v-if="(role=='Admin' || role=='Finance' || role =='Reservations' || role =='Front Office') && !obj.invoice">
                                                     <router-link :to="{name:'booking/checkin', params:{ id: obj.id }}" class="btn btn-sm btn-save btn-info">
                                                         Check In
                                                     </router-link>
@@ -534,8 +560,7 @@
     const searchFromCreatedBy =ref()
     const users = ref([])
 
-    const userRole = ref('');
-    const roleId = ref('');
+
 
     const url = (obj)=>{
        return 'https://tisyastays.rentals.management/storage/invoice/'+obj.invoice
@@ -651,8 +676,6 @@
     }
 
     const getBookingList = (pageNumber) => {
-        userRole.value = store.getters.user.role
-        roleId.value = store.getters.user.id
         isLoading.value = true
         let checkin_date = '';
         let checkout_date = '';
@@ -798,11 +821,9 @@
             checkout_date: checkout_date,
             channel: searchChannel.value,
             created_by:searchFromCreatedBy.value,
-            //role:role.value,
-           // userId:userId.value,
-
-           role: userRole.value,
-           roleId:roleId.value
+            role:role.value,
+            userId:userId.value,
+            type: type.value,
         };
         axios.post(`/api/booking/export` , reqParameters, { responseType: 'blob' }).then(response => {
             const blob = new Blob([response.data], { type: 'application/octet-stream' });

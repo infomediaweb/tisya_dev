@@ -28,7 +28,7 @@ class EnquireSaveEmailGuest extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Tisya Stays - Enquiry form submission ' . ($this->data['property_name'] ?? ''),
+            subject: 'Tisya Stays - Enquiry form submission for ' . ($this->data['property_name'] ?? ''),
         );
     }
 
